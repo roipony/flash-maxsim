@@ -64,19 +64,25 @@ def test_large_embedding_dim(d):
     assert torch.allclose(ref, out, atol=1.0), f"d={d}: max err={((ref-out).abs().max().item()):.4f}"
 
 
-@pytest.mark.parametrize("sparsity", [0.3, 0.5, 0.7])
-def test_sparse_maxsim(sparsity):
-    from flash_maxsim import flash_maxsim_sparse, maxsim_sparse_naive
+@pytest.mark.parametrize("keep", [0.25, 0.5, 0.75])
+def test_sparse_maxsim(keep):
+    from flash_maxsim import flash_maxsim, flash_maxsim_sparse
     Q, D = _sim(50, 32, 300, 128)
-    # Per-doc importance mask: keep top (1-sparsity) query tokens per doc
-    importance = torch.randn(50, 32, device="cuda")
-    k = int(32 * (1 - sparsity))
-    topk_idx = importance.topk(k, dim=1).indices
-    mask = torch.zeros(50, 32, device="cuda", dtype=torch.bool)
-    mask.scatter_(1, topk_idx, True)
-    ref = maxsim_sparse_naive(Q, D, mask)
-    out = flash_maxsim_sparse(Q, D, mask)
-    assert torch.allclose(ref, out, atol=1.0), f"sparsity={sparsity}: max err={((ref-out).abs().max().item()):.4f}"
+    k = max(1, int(32 * keep))
+    # Uniform query_lengths: same as dense with truncated Q
+    qlens = torch.full((50,), k, device="cuda", dtype=torch.int32)
+    ref = flash_maxsim(Q[:k], D)
+    out = flash_maxsim_sparse(Q, D, qlens)
+    assert torch.allclose(ref, out, atol=0.01), f"keep={keep}: max err={((ref-out).abs().max().item()):.4f}"
+
+
+def test_prepare_sparse():
+    from flash_maxsim import flash_maxsim_sparse, prepare_sparse
+    Q, D = _sim(50, 64, 300, 128)
+    importance = torch.randn(50, 64, device="cuda")
+    Q_sorted, qlens, order = prepare_sparse(Q, importance, keep_ratio=0.5)
+    scores = flash_maxsim_sparse(Q_sorted, D, qlens)
+    assert scores.shape == (50,)
 
 
 @pytest.mark.parametrize("d", [256, 512, 1024])
