@@ -85,9 +85,10 @@ print("=" * 55)
 # Flash-MaxSim
 from flash_maxsim import flash_maxsim_batched
 
-# Warmup (includes Triton compilation)
-print("  Warming up (Triton compilation)...", end=" ", flush=True)
+# Warmup BOTH (includes Triton compilation for Flash)
+print("  Warming up...", end=" ", flush=True)
 for _ in range(5):
+    _ = torch.einsum('nqd,bld->nbql', Q.float(), D.float()).max(3).values.sum(2)
     _ = flash_maxsim_batched(Q, D, shared_docs=True)
 torch.cuda.synchronize()
 print("done")
