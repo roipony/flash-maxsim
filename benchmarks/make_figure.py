@@ -79,7 +79,9 @@ ax1.text(200, 0.97, "Textual", ha="center", fontsize=11, color="#1565C0", alpha=
 ax1.text(750, 0.97, "Visual / Long-doc", ha="center", fontsize=11, color="#E65100", alpha=0.6,
          fontweight="bold", transform=ax1.get_xaxis_transform(), va="top")
 
-# Only annotate speedup at rightmost point (Ld=1024) to avoid overlap
+# Annotate speedup at first and last Ld points
+ANNOTATE_LDS = {128, 1024}
+
 for Lq in lq_values:
     pts = sorted([d for d in sweep if d["Lq"] == Lq], key=lambda d: d["Ld"])
     lds = [d["Ld"] for d in pts]
@@ -92,11 +94,17 @@ for Lq in lq_values:
     ax1.plot(lds, flash, '-', color=c, lw=3.5, marker='o', markersize=7,
              markeredgecolor="white", markeredgewidth=1, label=f"Lq={Lq}", zorder=5)
 
-    # Annotate speedup only at rightmost point
-    ax1.annotate(f"{speedup[-1]}x", (lds[-1], flash[-1]),
-                 fontsize=10, fontweight="bold", color=c, ha="left",
-                 xytext=(8, 0), textcoords="offset points",
-                 bbox=dict(boxstyle="round,pad=0.15", fc="white", ec=c, alpha=0.85, lw=0.8))
+    for i, ld in enumerate(lds):
+        if ld in ANNOTATE_LDS:
+            # Place label to the right at last point, above at first point
+            if ld == lds[-1]:
+                xytext, ha = (8, 0), "left"
+            else:
+                xytext, ha = (0, 10), "center"
+            ax1.annotate(f"{speedup[i]}x", (ld, flash[i]),
+                         fontsize=9, fontweight="bold", color=c, ha=ha,
+                         xytext=xytext, textcoords="offset points",
+                         bbox=dict(boxstyle="round,pad=0.15", fc="white", ec=c, alpha=0.85, lw=0.8))
 
 ax1.set_yscale("log")
 ax1.set_xlabel("Document length (Ld)", fontsize=12)
@@ -116,7 +124,8 @@ ax2.set_facecolor(BG)
 
 corpus = data["sweep_corpus"]
 
-# Annotate speedup only at rightmost B point
+ANNOTATE_BS = {500, 5000}
+
 for tag in ["textual", "long_doc", "visual"]:
     pts = sorted([d for d in corpus if d["tag"] == tag], key=lambda d: d["B"])
     Bs = [d["B"] for d in pts]
@@ -131,14 +140,16 @@ for tag in ["textual", "long_doc", "visual"]:
     ax2.plot(Bs, flash, '-', color=c, lw=3.5, marker='o', markersize=7,
              markeredgecolor="white", markeredgewidth=1, label=TAG_LABELS[tag], zorder=5)
 
-    # Annotate speedup at rightmost valid point
-    valid_sp = [(b, s, f) for b, s, f in zip(Bs, speedup, flash) if s == s]
-    if valid_sp:
-        b, s, f = valid_sp[-1]
-        ax2.annotate(f"{s}x", (b, f),
-                     fontsize=10, fontweight="bold", color=c, ha="left",
-                     xytext=(8, 0), textcoords="offset points",
-                     bbox=dict(boxstyle="round,pad=0.15", fc="white", ec=c, alpha=0.85, lw=0.8))
+    for i, b in enumerate(Bs):
+        if b in ANNOTATE_BS and speedup[i] == speedup[i]:
+            if b == Bs[-1] or b == max(ANNOTATE_BS):
+                xytext, ha = (8, 0), "left"
+            else:
+                xytext, ha = (0, 10), "center"
+            ax2.annotate(f"{speedup[i]}x", (b, flash[i]),
+                         fontsize=9, fontweight="bold", color=c, ha=ha,
+                         xytext=xytext, textcoords="offset points",
+                         bbox=dict(boxstyle="round,pad=0.15", fc="white", ec=c, alpha=0.85, lw=0.8))
 
 ax2.set_yscale("log")
 ax2.set_xlabel("Corpus size (B docs)", fontsize=12)
