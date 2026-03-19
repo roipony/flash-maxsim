@@ -39,7 +39,7 @@ print("SWEEP 1: Sequence length landscape (B=1000)")
 print("=" * 60)
 B = 1000
 sweep_seq = []
-for Lq in [32, 64, 128, 256, 512, 1024]:
+for Lq in [32, 128, 512, 1024]:
     for Ld in [128, 256, 512, 768, 1024]:
         # skip combos that would OOM on naive
         if Lq * Ld * B * 4 > 60e9:

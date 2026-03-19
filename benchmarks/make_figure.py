@@ -34,9 +34,7 @@ plt.rcParams.update({
 # Bold, high-contrast colors
 LQ_COLORS = {
     32:   "#1565C0",  # strong blue
-    64:   "#6A1B9A",  # purple
-    128:  "#00838F",  # teal
-    256:  "#2E7D32",  # green
+    128:  "#2E7D32",  # green
     512:  "#E65100",  # orange
     1024: "#C62828",  # red
 }
