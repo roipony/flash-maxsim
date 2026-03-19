@@ -93,6 +93,18 @@ score = sum(m)                          # → HBM
 
 Same pattern as Flash Attention, but simpler: `max` is trivially composable (no rescaling needed unlike `softmax`).
 
+## Supported Embedding Dimensions
+
+Works with any embedding dimension. Autotune selects optimal block sizes per config:
+
+| Dimension | Models | Status |
+|-----------|--------|--------|
+| d=128 | ColBERT, ColPali, answerai-colbert-small | Tested |
+| d=256 | BGE-M3, multilingual models | Tested |
+| d=512 | Large bi-encoders | Tested |
+| d=1024 | E5-large, GTE-large | Tested |
+| d=2048 | Custom / fine-tuned models | Tested |
+
 ## API
 
 | Function | Input → Output | Description |

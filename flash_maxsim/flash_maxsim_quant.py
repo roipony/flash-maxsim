@@ -39,7 +39,9 @@ def dequantize_int8(D_uint8: torch.Tensor, scales: torch.Tensor, mins: torch.Ten
 
 @triton.autotune(
     configs=[
-        triton.Config({"BLOCK_Q": 16, "BLOCK_D": 32}, num_warps=4, num_stages=2),
+        triton.Config({"BLOCK_Q": 16, "BLOCK_D": 16}, num_warps=2, num_stages=2),
+        triton.Config({"BLOCK_Q": 16, "BLOCK_D": 32}, num_warps=2, num_stages=2),
+        triton.Config({"BLOCK_Q": 32, "BLOCK_D": 32}, num_warps=4, num_stages=2),
         triton.Config({"BLOCK_Q": 16, "BLOCK_D": 64}, num_warps=4, num_stages=2),
         triton.Config({"BLOCK_Q": 32, "BLOCK_D": 64}, num_warps=4, num_stages=2),
         triton.Config({"BLOCK_Q": 32, "BLOCK_D": 128}, num_warps=8, num_stages=2),

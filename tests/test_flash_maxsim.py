@@ -53,3 +53,25 @@ def test_train():
     s = flash_maxsim_train(Q, D)
     s.sum().backward()
     assert Q.grad is not None
+
+
+@pytest.mark.parametrize("d", [256, 512, 1024, 2048])
+def test_large_embedding_dim(d):
+    from flash_maxsim import flash_maxsim, maxsim_naive
+    Q, D = _sim(20, 32, 128, d)
+    ref = maxsim_naive(Q, D)
+    out = flash_maxsim(Q, D)
+    assert torch.allclose(ref, out, atol=1.0), f"d={d}: max err={((ref-out).abs().max().item()):.4f}"
+
+
+@pytest.mark.parametrize("d", [256, 512, 1024])
+def test_large_dim_int8(d):
+    from flash_maxsim import flash_maxsim_int8, flash_maxsim, quantize_int8
+    Q, D = _sim(20, 32, 128, d)
+    D_q, s, m = quantize_int8(D)
+    scores_fp = flash_maxsim(Q, D)
+    scores_q8 = flash_maxsim_int8(Q, D_q, s, m)
+    # INT8 has quantization error, just check rankings match for top-5
+    fp_rank = scores_fp.argsort(descending=True)[:5]
+    q8_rank = scores_q8.argsort(descending=True)[:5]
+    assert (fp_rank == q8_rank).all(), f"d={d}: ranking mismatch"
