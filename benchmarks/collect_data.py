@@ -108,7 +108,7 @@ mem_configs = [
     (1024, 1024, "visual"),
 ]
 for Lq, Ld, tag in mem_configs:
-    B_values = [500, 1000, 2000, 5000, 10000, 20000] if tag != "visual" else [100, 500, 1000, 2000]
+    B_values = [500, 1000, 2000, 5000, 10000] if tag != "visual" else [100, 500, 1000, 2000]
     for B in B_values:
         # Check if D alone would exceed GPU memory
         d_gb = B * Ld * 128 * 2 / 1e9  # FP16 storage
