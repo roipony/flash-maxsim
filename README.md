@@ -5,24 +5,15 @@ Fused Triton GPU kernel for ColBERT/ColPali MaxSim scoring. Up to **13x faster**
 ## Get Started (copy-paste)
 
 ```bash
-# Clone and install
-git clone https://github.ibm.com/Video-AI/flash_maxsim.git
+git clone -b release --single-branch git@github.ibm.com:Video-AI/flash_maxsim.git
 cd flash_maxsim
 uv venv && source .venv/bin/activate
 uv pip install -e ".[dev]"
-
-# Run tests
 pytest tests/ -v
-
-# Run benchmark
 python benchmarks/bench.py
 
-# Run demo (with real ColBERT model)
-uv pip install pylate sentence-transformers
-python examples/demo.py
-
-# Run interactive notebook
-uv pip install jupyter matplotlib
+# For the notebook:
+uv pip install jupyter matplotlib pylate sentence-transformers
 jupyter notebook examples/demo_notebook.ipynb
 ```
 
