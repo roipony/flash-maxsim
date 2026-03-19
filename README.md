@@ -8,18 +8,23 @@ Tested on: H100 80GB, A100, V100.
 
 ![Flash-MaxSim Benchmarks](benchmarks/flash_maxsim_benchmarks.png)
 
-## Get Started (copy-paste)
+## Install
+
+```bash
+pip install flash-maxsim
+```
+
+## Get Started (from source)
 
 ```bash
 git clone https://github.com/roipony/flash-maxsim.git
-cd flash_maxsim
-uv venv && source .venv/bin/activate
-uv pip install -e ".[dev]"
+cd flash-maxsim
+pip install -e ".[dev]"
 pytest tests/ -v
 python benchmarks/bench.py
 
 # For the notebook (includes pylate, jupyter, matplotlib):
-uv pip install -e ".[dev,notebook]"
+pip install -e ".[dev,notebook]"
 jupyter notebook examples/demo_notebook.ipynb
 ```
 
