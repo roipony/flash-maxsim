@@ -5,7 +5,7 @@ Fused Triton GPU kernel for ColBERT/ColPali MaxSim scoring. Up to **13x faster**
 ## Get Started (copy-paste)
 
 ```bash
-git clone -b release --single-branch git@github.ibm.com:Video-AI/flash_maxsim.git
+git clone https://github.com/roipony/flash-maxsim.git
 cd flash_maxsim
 uv venv && source .venv/bin/activate
 uv pip install -e ".[dev]"
