@@ -64,6 +64,21 @@ def test_large_embedding_dim(d):
     assert torch.allclose(ref, out, atol=1.0), f"d={d}: max err={((ref-out).abs().max().item()):.4f}"
 
 
+@pytest.mark.parametrize("sparsity", [0.3, 0.5, 0.7])
+def test_sparse_maxsim(sparsity):
+    from flash_maxsim import flash_maxsim_sparse, maxsim_sparse_naive
+    Q, D = _sim(50, 32, 300, 128)
+    # Per-doc importance mask: keep top (1-sparsity) query tokens per doc
+    importance = torch.randn(50, 32, device="cuda")
+    k = int(32 * (1 - sparsity))
+    topk_idx = importance.topk(k, dim=1).indices
+    mask = torch.zeros(50, 32, device="cuda", dtype=torch.bool)
+    mask.scatter_(1, topk_idx, True)
+    ref = maxsim_sparse_naive(Q, D, mask)
+    out = flash_maxsim_sparse(Q, D, mask)
+    assert torch.allclose(ref, out, atol=1.0), f"sparsity={sparsity}: max err={((ref-out).abs().max().item()):.4f}"
+
+
 @pytest.mark.parametrize("d", [256, 512, 1024])
 def test_large_dim_int8(d):
     from flash_maxsim import flash_maxsim_int8, flash_maxsim, quantize_int8
