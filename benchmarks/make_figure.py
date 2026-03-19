@@ -67,7 +67,6 @@ fig.text(0.5, 0.932,
 # ═══════════════════════════════════════════════════════════════════
 ax1 = fig.add_subplot(2, 2, 1)
 ax1.set_facecolor(BG)
-ax1_r = ax1.twinx()
 
 sweep = data["sweep_seq"]
 lq_values = sorted(set(d["Lq"] for d in sweep))
@@ -80,6 +79,9 @@ ax1.text(200, 0.97, "Textual", ha="center", fontsize=11, color="#1565C0", alpha=
 ax1.text(750, 0.97, "Visual / Long-doc", ha="center", fontsize=11, color="#E65100", alpha=0.6,
          fontweight="bold", transform=ax1.get_xaxis_transform(), va="top")
 
+# Key Ld points where we annotate speedup
+ANNOTATE_LDS = {128, 512, 1024}
+
 for Lq in lq_values:
     pts = sorted([d for d in sweep if d["Lq"] == Lq], key=lambda d: d["Ld"])
     lds = [d["Ld"] for d in pts]
@@ -91,21 +93,18 @@ for Lq in lq_values:
     ax1.plot(lds, naive, '--', color=c, alpha=0.45, lw=2.5)
     ax1.plot(lds, flash, '-', color=c, lw=3.5, marker='o', markersize=7,
              markeredgecolor="white", markeredgewidth=1, label=f"Lq={Lq}", zorder=5)
-    ax1_r.plot(lds, speedup, ':', color=c, alpha=0.7, lw=2)
-    # Annotate peak speedup
-    peak_idx = int(np.argmax(speedup))
-    ax1_r.annotate(f"{speedup[peak_idx]}x", (lds[peak_idx], speedup[peak_idx]),
-                   fontsize=11, fontweight="bold", color=c, ha="center",
-                   xytext=(0, 10), textcoords="offset points")
+
+    # Annotate speedup at key Ld points
+    for i, ld in enumerate(lds):
+        if ld in ANNOTATE_LDS:
+            ax1.annotate(f"{speedup[i]}x", (ld, flash[i]),
+                         fontsize=9, fontweight="bold", color=c, ha="center",
+                         xytext=(0, -14), textcoords="offset points",
+                         bbox=dict(boxstyle="round,pad=0.15", fc="white", ec=c, alpha=0.8, lw=0.8))
 
 ax1.set_yscale("log")
 ax1.set_xlabel("Document length (Ld)", fontsize=12)
 ax1.set_ylabel("Latency (ms, log scale)", fontsize=12)
-ax1_r.set_ylabel("Speedup (×)", color=C_SPEEDUP, fontsize=12)
-ax1_r.tick_params(axis="y", colors=C_SPEEDUP, labelsize=11)
-ax1_r.spines["right"].set_visible(True)
-ax1_r.spines["right"].set_color(C_SPEEDUP)
-ax1_r.spines["right"].set_linewidth(1.5)
 ax1.set_title("Speedup vs Sequence Length (B=1000)\nsolid = Flash, dashed = Naive",
               fontsize=14, fontweight="bold", pad=14)
 ax1.legend(loc="upper left", fontsize=10, title="Query length", title_fontsize=11,
@@ -118,9 +117,11 @@ ax1.grid(axis="y", alpha=0.3, which="both")
 # ═══════════════════════════════════════════════════════════════════
 ax2 = fig.add_subplot(2, 2, 2)
 ax2.set_facecolor(BG)
-ax2_r = ax2.twinx()
 
 corpus = data["sweep_corpus"]
+
+# Key B points to annotate speedup
+ANNOTATE_BS = {500, 2000, 5000}
 
 for tag in ["textual", "long_doc", "visual"]:
     pts = sorted([d for d in corpus if d["tag"] == tag], key=lambda d: d["B"])
@@ -136,21 +137,17 @@ for tag in ["textual", "long_doc", "visual"]:
     ax2.plot(Bs, flash, '-', color=c, lw=3.5, marker='o', markersize=7,
              markeredgecolor="white", markeredgewidth=1, label=TAG_LABELS[tag], zorder=5)
 
-    valid_sp = [(b, s) for b, s in zip(Bs, speedup) if s == s]
-    if valid_sp:
-        ax2_r.plot(*zip(*valid_sp), ':', color=c, alpha=0.7, lw=2)
-        b, s = valid_sp[-1]
-        ax2_r.annotate(f"{s}x", (b, s), fontsize=11, fontweight="bold", color=c,
-                       xytext=(8, 5), textcoords="offset points")
+    # Annotate speedup at key B points
+    for i, b in enumerate(Bs):
+        if b in ANNOTATE_BS and speedup[i] == speedup[i]:  # not NaN
+            ax2.annotate(f"{speedup[i]}x", (b, flash[i]),
+                         fontsize=9, fontweight="bold", color=c, ha="center",
+                         xytext=(0, -14), textcoords="offset points",
+                         bbox=dict(boxstyle="round,pad=0.15", fc="white", ec=c, alpha=0.8, lw=0.8))
 
 ax2.set_yscale("log")
 ax2.set_xlabel("Corpus size (B docs)", fontsize=12)
 ax2.set_ylabel("Latency (ms, log scale)", fontsize=12)
-ax2_r.set_ylabel("Speedup (×)", color=C_SPEEDUP, fontsize=12)
-ax2_r.tick_params(axis="y", colors=C_SPEEDUP, labelsize=11)
-ax2_r.spines["right"].set_visible(True)
-ax2_r.spines["right"].set_color(C_SPEEDUP)
-ax2_r.spines["right"].set_linewidth(1.5)
 ax2.set_title("Scaling with Corpus Size\nsolid = Flash, dashed = Naive",
               fontsize=14, fontweight="bold", pad=14)
 ax2.legend(loc="upper left", fontsize=10, framealpha=0.9, edgecolor="#ccc")
@@ -240,7 +237,6 @@ ax4.grid(axis="y", alpha=0.3, which="both")
 legend_elements = [
     Line2D([0], [0], color="#555", lw=3, linestyle="--", label="Naive PyTorch"),
     Line2D([0], [0], color="#555", lw=3.5, linestyle="-", label="Flash-MaxSim"),
-    Line2D([0], [0], color=C_SPEEDUP, lw=2, linestyle=":", label="Speedup (right axis)"),
 ]
 fig.legend(handles=legend_elements, loc="lower center", ncol=3, fontsize=12,
            frameon=True, fancybox=True, shadow=False, bbox_to_anchor=(0.5, 0.008),
