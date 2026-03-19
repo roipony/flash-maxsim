@@ -6,6 +6,8 @@ Fused Triton GPU kernel for ColBERT/ColPali MaxSim scoring. Up to **13x faster**
 
 Tested on: H100 80GB, A100, V100.
 
+![Flash-MaxSim Benchmarks](benchmarks/flash_maxsim_benchmarks.png)
+
 ## Get Started (copy-paste)
 
 ```bash
