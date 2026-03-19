@@ -102,8 +102,14 @@ print("SWEEP 3: Peak memory")
 print("=" * 60)
 sweep_mem = []
 gpu_mem_gb = torch.cuda.get_device_properties(0).total_memory / 1e9
-for Lq, Ld, tag in configs:
-    for B in [500, 1000, 2000, 5000, 10000, 20000]:
+mem_configs = [
+    (32, 300, "textual"),
+    (32, 1024, "long_doc"),
+    (1024, 1024, "visual"),
+]
+for Lq, Ld, tag in mem_configs:
+    B_values = [500, 1000, 2000, 5000, 10000, 20000] if tag != "visual" else [100, 500, 1000, 2000]
+    for B in B_values:
         # Check if D alone would exceed GPU memory
         d_gb = B * Ld * 128 * 2 / 1e9  # FP16 storage
         if d_gb > gpu_mem_gb * 0.7:
