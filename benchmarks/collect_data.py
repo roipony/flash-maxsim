@@ -119,7 +119,7 @@ for Lq, Ld, tag in mem_configs:
         # Check total memory needed: D_fp16 + D_fp32 + Q_fp32 + sim_matrix
         sim_gb = B * Lq * Ld * 4 / 1e9
         total_needed = d_gb + (B * Ld * 128 * 4 / 1e9) + sim_gb  # D_fp32 + sim
-        if total_needed > gpu_mem_gb * 0.85:
+        if total_needed > gpu_mem_gb * 0.5:
             # Skip naive, use theoretical sim size
             Q = F.normalize(torch.randn(1, Lq, 128, device='cuda', dtype=torch.float16), dim=-1)
             D = F.normalize(torch.randn(B, Ld, 128, device='cuda', dtype=torch.float16), dim=-1)
@@ -152,8 +152,10 @@ for Lq, Ld, tag in mem_configs:
             torch.cuda.synchronize()
             naive_gb = (torch.cuda.max_memory_allocated() - base) / 1e9
             del _
-        except RuntimeError:
+        except Exception:
             naive_gb = sim_gb
+            # Reset CUDA after error
+            torch.cuda.synchronize()
         torch.cuda.empty_cache()
 
         # Flash memory
