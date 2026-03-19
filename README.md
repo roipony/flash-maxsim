@@ -12,8 +12,8 @@ uv pip install -e ".[dev]"
 pytest tests/ -v
 python benchmarks/bench.py
 
-# For the notebook:
-uv pip install jupyter matplotlib pylate sentence-transformers
+# For the notebook (includes pylate, jupyter, matplotlib):
+uv pip install -e ".[dev,notebook]"
 jupyter notebook examples/demo_notebook.ipynb
 ```
 
