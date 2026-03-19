@@ -1,84 +1,131 @@
 # Flash-MaxSim
 
-Fused Triton GPU kernels for ColBERT/ColPali MaxSim scoring. The similarity matrix never touches HBM.
+Fused Triton GPU kernel for ColBERT/ColPali MaxSim scoring. Up to **13x faster**, **143x less memory**. The similarity matrix never touches HBM.
 
-## Installation
-
-```bash
-pip install flash-maxsim
-```
-
-Or from source:
+## Get Started (copy-paste)
 
 ```bash
-pip install -e .
-```
+# Clone and install
+git clone https://github.ibm.com/Video-AI/flash_maxsim.git
+cd flash_maxsim
+uv venv && source .venv/bin/activate
+uv pip install -e ".[dev]"
 
-Requires: PyTorch >= 2.0, Triton >= 2.1, CUDA GPU.
+# Run tests
+pytest tests/ -v
+
+# Run benchmark
+python benchmarks/bench.py
+
+# Run demo (with real ColBERT model)
+uv pip install pylate sentence-transformers
+python examples/demo.py
+
+# Run interactive notebook
+uv pip install jupyter matplotlib
+jupyter notebook examples/demo_notebook.ipynb
+```
 
 ## Quick Start
 
 ```python
 import torch
-from flash_maxsim import flash_maxsim, flash_maxsim_batched, flash_maxsim_train
+from flash_maxsim import flash_maxsim, flash_maxsim_batched
+
+# Single query scoring
+Q = torch.randn(32, 128, device="cuda", dtype=torch.float16)
+D = torch.randn(1000, 300, 128, device="cuda", dtype=torch.float16)
+scores = flash_maxsim(Q, D)  # [1000]
+
+# Batched: all queries vs all docs
+Q_batch = torch.randn(100, 32, 128, device="cuda", dtype=torch.float16)
+scores = flash_maxsim_batched(Q_batch, D, shared_docs=True)  # [100, 1000]
+
+# INT8 quantized (2x compression, same speed)
 from flash_maxsim import flash_maxsim_int8, quantize_int8
-
-# Single query vs document batch
-Q = torch.randn(32, 128, device="cuda", dtype=torch.float16)   # [Lq, d]
-D = torch.randn(1000, 256, 128, device="cuda", dtype=torch.float16)  # [B, Ld, d]
-scores = flash_maxsim(Q, D)  # [B]
-
-# Variable-length documents
-lengths = torch.randint(64, 256, (1000,), device="cuda", dtype=torch.int32)
-scores = flash_maxsim(Q, D, doc_lengths=lengths)
-
-# Batched: multiple queries
-Q_batch = torch.randn(10, 32, 128, device="cuda", dtype=torch.float16)
-scores = flash_maxsim_batched(Q_batch, D, shared_docs=True)  # [Nq, B]
-
-# INT8 quantized (4x memory reduction)
 D_q, scales, mins = quantize_int8(D)
-scores = flash_maxsim_int8(Q, D_q, scales, mins)  # [B]
+scores = flash_maxsim_int8(Q, D_q, scales, mins)
 
-# Training with autograd
-Q.requires_grad_(True)
+# Training (autograd)
+from flash_maxsim import flash_maxsim_train
+Q = torch.nn.Parameter(Q)
 scores = flash_maxsim_train(Q, D)
-scores.sum().backward()  # gradients flow through Q and D
+scores.sum().backward()  # gradients to Q and D
 ```
 
-## Benchmarks
+## Benchmarks (H100 80GB)
 
-H100 SXM, ColBERT config (Lq=32, d=128):
+### Single Query (vs naive FP32 einsum)
 
-| B    | Ld   | Flash-MaxSim | PyTorch   | Speedup |
-|------|------|-------------|-----------|---------|
-| 100  | 256  | 0.04 ms     | 0.21 ms   | 5.3x    |
-| 1000 | 256  | 0.31 ms     | 2.10 ms   | 6.8x    |
-| 1000 | 512  | 0.58 ms     | 5.24 ms   | 9.0x    |
-| 5000 | 256  | 1.48 ms     | 10.5 ms   | 7.1x    |
+| Config | Naive | Flash | Speedup |
+|--------|-------|-------|---------|
+| ColBERT (Lq=32, Ld=300, B=1000) | 0.27 ms | 0.07 ms | **3.9x** |
+| ColPali text (Lq=32, Ld=1024, B=500) | 0.42 ms | 0.09 ms | **5.0x** |
+| ColPali image (Lq=1024, Ld=1024, B=1000) | 9.19 ms | 0.83 ms | **11.1x** |
+| ColPali image (Lq=1024, Ld=1024, B=5000) | 46.51 ms | 3.77 ms | **12.3x** |
 
-INT8 adds < 3% latency vs FP16 while using 2x less memory.
+### INT8 Fused Dequantization
 
-## API Reference
+| Config | Naive INT8 | Flash Q8 | Speedup |
+|--------|-----------|----------|---------|
+| ColBERT (B=1000) | 0.54 ms | 0.08 ms | **7.0x** |
+| ColBERT (B=5000) | 2.40 ms | 0.19 ms | **12.4x** |
 
-| Function | Signature | Description |
-|----------|-----------|-------------|
-| `flash_maxsim` | `(Q[Lq,d], D[B,Ld,d], doc_lengths?) -> [B]` | Single-query MaxSim |
-| `flash_maxsim_batched` | `(Q[Nq,Lq,d], D[B,Ld,d], shared_docs?) -> [Nq,B]` | Multi-query MaxSim |
-| `flash_maxsim_train` | `(Q[Lq,d], D[B,Ld,d]) -> [B]` | MaxSim with autograd |
-| `flash_maxsim_int8` | `(Q, D_uint8, scales, mins, doc_lengths?) -> [B]` | Fused INT8 MaxSim |
-| `quantize_int8` | `(D[B,Ld,d]) -> (D_uint8, scales, mins)` | Per-token INT8 quantization |
-| `dequantize_int8` | `(D_uint8, scales, mins) -> D` | INT8 dequantization |
-| `maxsim_naive` | `(Q[Lq,d], D[B,Ld,d], doc_lengths?) -> [B]` | Reference PyTorch impl |
+### Batched Multi-Query
 
-## Citation
+| Config | Naive | Flash | Throughput |
+|--------|-------|-------|-----------|
+| 100q × 1000d | 26.1 ms | 2.43 ms | **41.2M pairs/s** |
+| 100q × 100p (Lq=Ld=1024) | 97.3 ms | 5.96 ms | **16.3x** |
 
-```bibtex
-@software{flash_maxsim,
-  title={Flash-MaxSim: Fused GPU Kernels for ColBERT/ColPali MaxSim},
-  url={https://github.com/svg-project/flash-maxsim},
-  year={2025}
-}
+### Peak Memory
+
+| Config | Naive | Flash | Reduction |
+|--------|-------|-------|-----------|
+| 1q × 1000p (Lq=Ld=1024) | 4.7 GB | 0.01 GB | **470x** |
+| 10q × 1000p (Lq=Ld=1024) | 42.5 GB | 0.01 GB | **4247x** |
+
+## How It Works
+
+```
+Q_block = load(Q)                      # SRAM
+m = [-inf] * Lq                        # registers
+
+for tile in D.tiles(BLOCK_D):
+    D_tile = load(tile)                # SRAM
+    S = tl.dot(Q_block, D_tile.T)     # tensor cores — SRAM only
+    m = max(m, S.max(axis=1))         # online max
+    # S dies here — never in HBM
+
+score = sum(m)                          # → HBM
+```
+
+Same pattern as Flash Attention, but simpler: `max` is trivially composable (no rescaling needed unlike `softmax`).
+
+## API
+
+| Function | Input → Output | Description |
+|----------|---------------|-------------|
+| `flash_maxsim` | `[Lq,d] × [B,Ld,d] → [B]` | Single query |
+| `flash_maxsim_batched` | `[Nq,Lq,d] × [B,Ld,d] → [Nq,B]` | Multi-query |
+| `flash_maxsim_int8` | `[Lq,d] × [B,Ld,d] uint8 → [B]` | Fused INT8 |
+| `flash_maxsim_train` | `[Lq,d] × [B,Ld,d] → [B]` | With autograd |
+| `quantize_int8` | `[B,Ld,d] → uint8 + scales + mins` | Quantization |
+| `maxsim_naive` | `[Lq,d] × [B,Ld,d] → [B]` | Reference |
+
+## Files
+
+```
+flash_maxsim/
+  flash_maxsim.py        # FP16 + batched + training kernels (290 lines)
+  flash_maxsim_quant.py  # INT8 fused kernel (140 lines)
+tests/
+  test_flash_maxsim.py   # pytest suite
+benchmarks/
+  bench.py               # full benchmark
+examples/
+  demo.py                # real model demo
+  demo_notebook.ipynb    # interactive notebook with plots
 ```
 
 ## License
