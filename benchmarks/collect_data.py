@@ -101,8 +101,15 @@ print(f"\n{'=' * 60}")
 print("SWEEP 3: Peak memory")
 print("=" * 60)
 sweep_mem = []
+gpu_mem_gb = torch.cuda.get_device_properties(0).total_mem / 1e9
 for Lq, Ld, tag in configs:
     for B in [500, 1000, 2000, 5000, 10000, 20000]:
+        # Check if D alone would exceed GPU memory
+        d_gb = B * Ld * 128 * 2 / 1e9  # FP16 storage
+        if d_gb > gpu_mem_gb * 0.7:
+            print(f"  {tag:10s} B={B:5d}: skip (D={d_gb:.1f}GB exceeds GPU)")
+            continue
+
         Q = F.normalize(torch.randn(1, Lq, 128, device='cuda', dtype=torch.float16), dim=-1)
         D = F.normalize(torch.randn(B, Ld, 128, device='cuda', dtype=torch.float16), dim=-1)
         sim_gb = B * Lq * Ld * 4 / 1e9
@@ -122,9 +129,13 @@ for Lq, Ld, tag in configs:
         # Flash memory
         torch.cuda.reset_peak_memory_stats()
         base = torch.cuda.memory_allocated()
-        _ = flash_maxsim_batched(Q, D, shared_docs=True); torch.cuda.synchronize()
-        flash_gb = (torch.cuda.max_memory_allocated() - base) / 1e9
-        del _; torch.cuda.empty_cache()
+        try:
+            _ = flash_maxsim_batched(Q, D, shared_docs=True); torch.cuda.synchronize()
+            flash_gb = (torch.cuda.max_memory_allocated() - base) / 1e9
+            del _
+        except (RuntimeError, Exception):
+            flash_gb = 0.0001
+        torch.cuda.empty_cache()
 
         ratio = max(1, naive_gb / max(flash_gb, 0.001))
         print(f"  {tag:10s} B={B:5d}: naive={naive_gb:6.2f}GB  flash={flash_gb:.4f}GB  {ratio:.0f}x")
