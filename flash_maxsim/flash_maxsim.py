@@ -225,7 +225,7 @@ def flash_maxsim(Q: torch.Tensor, D: torch.Tensor, doc_lengths=None) -> torch.Te
 
 
 def flash_maxsim_batched(Q: torch.Tensor, D: torch.Tensor, doc_lengths=None,
-                         shared_docs: bool = False) -> torch.Tensor:
+                         shared_docs: bool = True) -> torch.Tensor:
     """Batched MaxSim. Q: [Nq, Lq, d], D: [B, Ld, d] -> [Nq, B]."""
     assert Q.dim() == 3 and Q.shape[2] == D.shape[-1]
     Nq, Lq, d = Q.shape
