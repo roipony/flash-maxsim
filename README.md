@@ -48,37 +48,43 @@ scores = flash_maxsim_train(Q, D)
 scores.sum().backward()  # gradients to Q and D
 ```
 
-## Benchmarks (H100 80GB)
+## Benchmarks (H100 80GB, triton 3.6.0)
 
-### Single Query (vs naive FP32 einsum)
+### Single Query Speedup (vs naive FP32 einsum, B=1000)
 
 | Config | Naive | Flash | Speedup |
 |--------|-------|-------|---------|
-| ColBERT (Lq=32, Ld=300, B=1000) | 0.27 ms | 0.07 ms | **3.9x** |
-| ColPali text (Lq=32, Ld=1024, B=500) | 0.42 ms | 0.09 ms | **5.0x** |
-| ColPali image (Lq=1024, Ld=1024, B=1000) | 9.19 ms | 0.83 ms | **11.1x** |
-| ColPali image (Lq=1024, Ld=1024, B=5000) | 46.51 ms | 3.77 ms | **12.3x** |
+| Textual (Lq=32, Ld=300) | 0.27 ms | 0.07 ms | **3.9x** |
+| Long-doc (Lq=32, Ld=1024) | 0.80 ms | 0.13 ms | **6.3x** |
+| Medium (Lq=128, Ld=1024) | 1.55 ms | 0.14 ms | **10.7x** |
+| Visual (Lq=1024, Ld=1024) | 9.47 ms | 0.85 ms | **11.2x** |
+
+### Corpus Scaling (single query)
+
+| Config | B=500 | B=1000 | B=5000 |
+|--------|-------|--------|--------|
+| Textual (Lq=32, Ld=300) | 3.0x | 3.9x | **7.2x** |
+| Long-doc (Lq=32, Ld=1024) | 4.7x | 6.3x | **8.3x** |
+| Visual (Lq=1024, Ld=1024) | 10.6x | 11.3x | **12.0x** |
 
 ### INT8 Fused Dequantization
 
-| Config | Naive INT8 | Flash Q8 | Speedup |
-|--------|-----------|----------|---------|
-| ColBERT (B=1000) | 0.54 ms | 0.08 ms | **7.0x** |
-| ColBERT (B=5000) | 2.40 ms | 0.19 ms | **12.4x** |
+| Config | Naive FP32 | Flash FP16 | Flash Q8 |
+|--------|-----------|------------|----------|
+| Textual B=1000 | 0.27 ms | 0.07 ms | 0.08 ms |
+| Textual B=5000 | 1.19 ms | 0.17 ms | 0.20 ms |
+| Long-doc B=5000 | 3.77 ms | 0.45 ms | 0.71 ms |
 
-### Batched Multi-Query
-
-| Config | Naive | Flash | Throughput |
-|--------|-------|-------|-----------|
-| 100q × 1000d | 26.1 ms | 2.43 ms | **41.2M pairs/s** |
-| 100q × 100p (Lq=Ld=1024) | 97.3 ms | 5.96 ms | **16.3x** |
+2x storage compression, same ranking quality. Dequantization fused in SRAM.
 
 ### Peak Memory
 
 | Config | Naive | Flash | Reduction |
 |--------|-------|-------|-----------|
-| 1q × 1000p (Lq=Ld=1024) | 4.7 GB | 0.01 GB | **470x** |
-| 10q × 1000p (Lq=Ld=1024) | 42.5 GB | 0.01 GB | **4247x** |
+| Textual 1q × 10K docs | 1.92 GB | <0.1 MB | **1920x** |
+| Long-doc 1q × 10K docs | 6.55 GB | <0.1 MB | **6554x** |
+| Visual 1q × 1K docs | 4.72 GB | <0.1 MB | **4719x** |
+| Visual 1q × 2K docs | 9.44 GB | <0.1 MB | **9438x** |
 
 ## How It Works
 
