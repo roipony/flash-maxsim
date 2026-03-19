@@ -143,6 +143,14 @@ examples/
   demo_notebook.ipynb    # interactive notebook with plots
 ```
 
+## Citation
+
+Coming soon.
+
+## Contact
+
+Roi Pony — [roi.pony@ibm.com](mailto:roi.pony@ibm.com)
+
 ## License
 
 Apache 2.0
