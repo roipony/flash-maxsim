@@ -194,7 +194,7 @@ ax3.set_xlabel("Corpus size (B docs)", fontsize=12)
 ax3.set_ylabel("Peak GPU Memory (GB, log scale)", fontsize=12)
 ax3.set_title("Memory: Naive Grows, Flash Stays Flat\nsolid = Flash, dashed = Naive",
               fontsize=14, fontweight="bold", pad=14)
-ax3.legend(loc="lower right", fontsize=10, framealpha=0.9, edgecolor="#ccc")
+ax3.legend(loc="center right", fontsize=10, framealpha=0.9, edgecolor="#ccc")
 ax3.grid(axis="y", alpha=0.3, which="both")
 
 # ═══════════════════════════════════════════════════════════════════
