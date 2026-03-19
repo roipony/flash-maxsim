@@ -6,6 +6,7 @@ Usage:
 """
 import json, time, torch, torch.nn.functional as F
 
+import triton
 assert torch.cuda.is_available(), "CUDA required"
 gpu_name = torch.cuda.get_device_name()
 print(f"GPU: {gpu_name}\n")
@@ -30,7 +31,7 @@ def make(B, Lq, Ld, d=128):
 def naive_fp32(Q, D):
     return torch.einsum('qd,bld->bql', Q.float(), D.float()).max(2).values.sum(1)
 
-results = {"gpu": gpu_name}
+results = {"gpu": gpu_name, "torch": torch.__version__, "triton": triton.__version__}
 
 # ── Sweep 1: Vary Ld at different Lq values (fixed B=1000) ──
 # Shows the textual → visual transition

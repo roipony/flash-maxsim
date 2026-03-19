@@ -56,8 +56,11 @@ BG = "#F8F9FA"
 fig = plt.figure(figsize=(20, 12), facecolor="white")
 
 fig.suptitle("Flash-MaxSim", fontsize=28, fontweight="bold", y=0.97)
+torch_ver = data.get("torch", "")
+triton_ver = data.get("triton", "")
+ver_str = f"  ·  torch {torch_ver}  ·  triton {triton_ver}" if torch_ver else ""
 fig.text(0.5, 0.932,
-         f"Fused GPU kernel for late-interaction retrieval  ·  {gpu}",
+         f"Fused GPU kernel for late-interaction retrieval  ·  {gpu}{ver_str}",
          ha="center", fontsize=14, color="#555", style="italic")
 
 # ═══════════════════════════════════════════════════════════════════
