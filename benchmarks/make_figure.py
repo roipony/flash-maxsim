@@ -233,9 +233,13 @@ legend_elements = [
     Line2D([0], [0], color="#555", lw=3, linestyle="--", label="Naive PyTorch"),
     Line2D([0], [0], color="#555", lw=3.5, linestyle="-", label="Flash-MaxSim"),
 ]
-fig.legend(handles=legend_elements, loc="lower center", ncol=3, fontsize=12,
-           frameon=True, fancybox=True, shadow=False, bbox_to_anchor=(0.5, 0.008),
+fig.legend(handles=legend_elements, loc="lower center", ncol=2, fontsize=12,
+           frameon=True, fancybox=True, shadow=False, bbox_to_anchor=(0.3, 0.008),
            edgecolor="#ccc")
+
+# Notation box
+notation = "Lq = query tokens  ·  Ld = document tokens  ·  B = corpus size (docs)  ·  d = embedding dim (128)"
+fig.text(0.75, 0.015, notation, ha="center", fontsize=10, color="#777", style="italic")
 
 # ── Save ──
 plt.tight_layout(rect=[0, 0.04, 1, 0.915])
