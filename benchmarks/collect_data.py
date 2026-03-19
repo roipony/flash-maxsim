@@ -102,7 +102,7 @@ print("SWEEP 3: Peak memory")
 print("=" * 60)
 sweep_mem = []
 for Lq, Ld, tag in configs:
-    for B in [100, 500, 1000, 2000]:
+    for B in [500, 1000, 2000, 5000, 10000, 20000]:
         Q = F.normalize(torch.randn(1, Lq, 128, device='cuda', dtype=torch.float16), dim=-1)
         D = F.normalize(torch.randn(B, Ld, 128, device='cuda', dtype=torch.float16), dim=-1)
         sim_gb = B * Lq * Ld * 4 / 1e9
