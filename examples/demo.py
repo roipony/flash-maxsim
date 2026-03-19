@@ -82,24 +82,40 @@ print("=" * 55)
 print("Scoring: Naive PyTorch vs Flash-MaxSim")
 print("=" * 55)
 
-# Naive
-t0 = time.perf_counter()
-S_naive = torch.einsum('nqd,pld->npql', Q.float(), D.float())
-scores_naive = S_naive.max(dim=3).values.sum(dim=2)
-torch.cuda.synchronize()
-t_naive = (time.perf_counter() - t0) * 1000
-
 # Flash-MaxSim
 from flash_maxsim import flash_maxsim_batched
 
-t0 = time.perf_counter()
-scores_flash = flash_maxsim_batched(Q, D, shared_docs=True)
+# Warmup (includes Triton compilation)
+print("  Warming up (Triton compilation)...", end=" ", flush=True)
+for _ in range(5):
+    _ = flash_maxsim_batched(Q, D, shared_docs=True)
 torch.cuda.synchronize()
-t_flash = (time.perf_counter() - t0) * 1000
+print("done")
 
-print(f"  Naive:  {t_naive:.2f} ms")
-print(f"  Flash:  {t_flash:.2f} ms")
-print(f"  Speedup: {t_naive/t_flash:.1f}x\n")
+# Naive
+torch.cuda.synchronize()
+t0 = time.perf_counter()
+for _ in range(20):
+    S_naive = torch.einsum('nqd,pld->npql', Q.float(), D.float())
+    scores_naive = S_naive.max(dim=3).values.sum(dim=2)
+torch.cuda.synchronize()
+t_naive = (time.perf_counter() - t0) * 1000 / 20
+
+# Flash
+torch.cuda.synchronize()
+t0 = time.perf_counter()
+for _ in range(20):
+    scores_flash = flash_maxsim_batched(Q, D, shared_docs=True)
+torch.cuda.synchronize()
+t_flash = (time.perf_counter() - t0) * 1000 / 20
+
+print(f"  Naive:  {t_naive:.3f} ms")
+print(f"  Flash:  {t_flash:.3f} ms")
+if t_naive > t_flash:
+    print(f"  Speedup: {t_naive/t_flash:.1f}x")
+else:
+    print(f"  (Small input — speedup shows at larger scale)")
+print()
 
 # ── 4. Show rankings ─────────────────────────────────────────────
 print("=" * 55)
