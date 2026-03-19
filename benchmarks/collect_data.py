@@ -101,7 +101,7 @@ print(f"\n{'=' * 60}")
 print("SWEEP 3: Peak memory")
 print("=" * 60)
 sweep_mem = []
-gpu_mem_gb = torch.cuda.get_device_properties(0).total_mem / 1e9
+gpu_mem_gb = torch.cuda.get_device_properties(0).total_memory / 1e9
 for Lq, Ld, tag in configs:
     for B in [500, 1000, 2000, 5000, 10000, 20000]:
         # Check if D alone would exceed GPU memory
