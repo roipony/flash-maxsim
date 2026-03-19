@@ -1,13 +1,15 @@
-"""Generate landing page figure from benchmark JSON files.
+"""Generate landing page figure from continuous sweep data.
 
 Usage:
     python benchmarks/make_figure.py benchmarks/results_*.json
     # produces benchmarks/flash_maxsim_benchmarks.png
 """
-import json, sys, glob
+import json, sys, glob, math
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import numpy as np
+from matplotlib.lines import Line2D
+from matplotlib.patches import FancyBboxPatch
 
 # ── Load data ──
 files = sys.argv[1:] or sorted(glob.glob("benchmarks/results_*.json"))
@@ -19,7 +21,6 @@ for f in files:
         all_data.append(json.load(fh))
     print(f"Loaded: {f} ({all_data[-1]['gpu']})")
 
-# Use first GPU's data (or combine if multiple)
 data = all_data[0]
 gpu = data["gpu"]
 
@@ -30,125 +31,205 @@ plt.rcParams.update({
     "axes.spines.top": False,
     "axes.spines.right": False,
 })
-NAIVE_COLOR = "#FF7043"
-FLASH_COLOR = "#1E88E5"
-Q8_COLOR = "#2E7D32"
-MEM_NAIVE = "#FF8A65"
-MEM_FLASH = "#42A5F5"
-BG_COLOR = "#FAFAFA"
 
-fig = plt.figure(figsize=(18, 10), facecolor="white")
-fig.suptitle(f"Flash-MaxSim  —  Fused GPU Kernel for ColBERT/ColPali MaxSim",
-             fontsize=20, fontweight="bold", y=0.97)
-fig.text(0.5, 0.935, f"Benchmarked on {gpu}  |  Similarity matrix never touches HBM",
-         ha="center", fontsize=12, color="#666", style="italic")
+# Colors
+C_NAIVE = "#D32F2F"
+C_FLASH = "#1565C0"
+C_Q8 = "#2E7D32"
+C_SPEEDUP = "#FF8F00"
+C_REGION_TEXT = "#E3F2FD"
+C_REGION_VIS = "#FFF3E0"
+BG = "#FAFAFA"
 
-# ── Panel 1: Speedup ──
+fig = plt.figure(figsize=(20, 12), facecolor="white")
+
+fig.suptitle("Flash-MaxSim", fontsize=26, fontweight="bold", y=0.97,
+             fontfamily="sans-serif")
+fig.text(0.5, 0.935,
+         f"Fused GPU kernel for late-interaction retrieval  ·  {gpu}",
+         ha="center", fontsize=13, color="#555", style="italic")
+
+# ═══════════════════════════════════════════════════════════════════
+# Panel 1: Speedup landscape — Ld on x-axis, lines per Lq
+# ═══════════════════════════════════════════════════════════════════
 ax1 = fig.add_subplot(2, 2, 1)
-ax1.set_facecolor(BG_COLOR)
-sp = data["speedup"]
-labels = [d["label"] for d in sp]
-naive_ms = [d["naive_ms"] for d in sp]
-flash_ms = [d["flash_ms"] for d in sp]
-speedups = [d["speedup"] for d in sp]
+ax1.set_facecolor(BG)
+ax1_r = ax1.twinx()
 
-x = np.arange(len(labels)); w = 0.32
-bars_n = ax1.bar(x - w/2, naive_ms, w, label="Naive FP32", color=NAIVE_COLOR, edgecolor="white", lw=0.8, zorder=3)
-bars_f = ax1.bar(x + w/2, flash_ms, w, label="Flash-MaxSim", color=FLASH_COLOR, edgecolor="white", lw=0.8, zorder=3)
+sweep = data["sweep_seq"]
+lq_values = sorted(set(d["Lq"] for d in sweep))
+ld_values = sorted(set(d["Ld"] for d in sweep))
 
-for i, s in enumerate(speedups):
-    ymax = max(naive_ms[i], flash_ms[i])
-    ax1.text(i, ymax * 1.08, f"{s}x", ha="center", fontsize=13, fontweight="bold", color=FLASH_COLOR, zorder=4)
+# Shade regions
+ax1.axvspan(0, 400, alpha=0.08, color="#1565C0", zorder=0)
+ax1.axvspan(400, 1100, alpha=0.06, color="#FF8F00", zorder=0)
+ax1.text(200, 0, "Textual", ha="center", fontsize=10, color="#1565C0", alpha=0.5,
+         fontweight="bold", transform=ax1.get_xaxis_transform(), va="bottom")
+ax1.text(750, 0, "Visual / Long-doc", ha="center", fontsize=10, color="#FF8F00", alpha=0.5,
+         fontweight="bold", transform=ax1.get_xaxis_transform(), va="bottom")
 
+cmap = plt.cm.viridis
+lq_colors = {lq: cmap(i / max(1, len(lq_values) - 1)) for i, lq in enumerate(lq_values)}
+
+for Lq in lq_values:
+    pts = sorted([d for d in sweep if d["Lq"] == Lq], key=lambda d: d["Ld"])
+    lds = [d["Ld"] for d in pts]
+    naive = [d["naive_ms"] for d in pts]
+    flash = [d["flash_ms"] for d in pts]
+    speedup = [d["speedup"] for d in pts]
+    c = lq_colors[Lq]
+
+    ax1.plot(lds, naive, '--', color=c, alpha=0.4, lw=1.5)
+    ax1.plot(lds, flash, '-', color=c, lw=2.5, marker='o', markersize=5, label=f"Lq={Lq}")
+    ax1_r.plot(lds, speedup, ':', color=c, alpha=0.6, lw=1.5)
+    # Annotate peak speedup
+    peak_idx = np.argmax(speedup)
+    ax1_r.annotate(f"{speedup[peak_idx]}x", (lds[peak_idx], speedup[peak_idx]),
+                   fontsize=9, fontweight="bold", color=c, ha="center",
+                   xytext=(0, 8), textcoords="offset points")
+
+ax1.set_xlabel("Document length (Ld)")
 ax1.set_ylabel("Latency (ms)")
-ax1.set_title("Kernel Speedup", fontsize=14, fontweight="bold", pad=10)
-ax1.set_xticks(x); ax1.set_xticklabels(labels, fontsize=9)
-ax1.legend(loc="upper left", fontsize=9)
-ax1.set_ylim(0, max(naive_ms) * 1.25)
-ax1.grid(axis="y", alpha=0.3, zorder=0)
+ax1_r.set_ylabel("Speedup (×)", color=C_SPEEDUP)
+ax1_r.tick_params(axis="y", colors=C_SPEEDUP)
+ax1_r.spines["right"].set_visible(True)
+ax1_r.spines["right"].set_color(C_SPEEDUP)
+ax1.set_title("Speedup vs Sequence Length\n(B=1000, solid=Flash, dashed=Naive)", fontsize=13, fontweight="bold", pad=12)
+ax1.legend(loc="upper left", fontsize=8, title="Query length", title_fontsize=9)
+ax1.set_xlim(100, 1080)
+ax1.grid(axis="y", alpha=0.2)
 
-# ── Panel 2: Memory ──
+# ═══════════════════════════════════════════════════════════════════
+# Panel 2: Corpus scaling — B on x-axis, lines per config
+# ═══════════════════════════════════════════════════════════════════
 ax2 = fig.add_subplot(2, 2, 2)
-ax2.set_facecolor(BG_COLOR)
-mem = data["memory"]
-labels_m = [d["label"] for d in mem]
-naive_gb = [d["naive_gb"] for d in mem]
-flash_gb = [d["flash_gb"] for d in mem]
-ratios = [d["ratio"] for d in mem]
+ax2.set_facecolor(BG)
+ax2_r = ax2.twinx()
 
-x = np.arange(len(labels_m)); w = 0.32
-ax2.bar(x - w/2, naive_gb, w, label="Naive einsum", color=MEM_NAIVE, edgecolor="white", lw=0.8, zorder=3)
-ax2.bar(x + w/2, flash_gb, w, label="Flash-MaxSim", color=MEM_FLASH, edgecolor="white", lw=0.8, zorder=3)
+corpus = data["sweep_corpus"]
+tag_style = {
+    "textual":  {"color": "#1565C0", "label": "Textual (Lq=32, Ld=300)"},
+    "long_doc": {"color": "#7B1FA2", "label": "Long-doc (Lq=32, Ld=1024)"},
+    "visual":   {"color": "#E65100", "label": "Visual (Lq=1024, Ld=1024)"},
+}
 
-for i, r in enumerate(ratios):
-    ymax = max(naive_gb[i], flash_gb[i])
-    ax2.text(i, ymax * 1.08, f"{r:.0f}x less", ha="center", fontsize=12, fontweight="bold", color=Q8_COLOR, zorder=4)
+for tag, style in tag_style.items():
+    pts = sorted([d for d in corpus if d["tag"] == tag], key=lambda d: d["B"])
+    Bs = [d["B"] for d in pts]
+    naive = [d["naive_ms"] for d in pts]
+    flash = [d["flash_ms"] for d in pts]
+    speedup = [d["speedup"] for d in pts]
+    c = style["color"]
 
-ax2.set_ylabel("Peak GPU Memory (GB)")
-ax2.set_title("Memory Reduction", fontsize=14, fontweight="bold", pad=10)
-ax2.set_xticks(x); ax2.set_xticklabels(labels_m, fontsize=9)
-ax2.legend(loc="upper left", fontsize=9)
-ax2.set_ylim(0, max(naive_gb) * 1.3)
-ax2.grid(axis="y", alpha=0.3, zorder=0)
+    # Filter NaN for naive (OOM)
+    valid_naive = [(b, n) for b, n in zip(Bs, naive) if n == n]
+    if valid_naive:
+        ax2.plot(*zip(*valid_naive), '--', color=c, alpha=0.4, lw=1.5)
+    ax2.plot(Bs, flash, '-', color=c, lw=2.5, marker='o', markersize=5, label=style["label"])
 
-# ── Panel 3: INT8 ──
+    valid_sp = [(b, s) for b, s in zip(Bs, speedup) if s == s]
+    if valid_sp:
+        ax2_r.plot(*zip(*valid_sp), ':', color=c, alpha=0.6, lw=1.5)
+        # Label last valid speedup
+        b, s = valid_sp[-1]
+        ax2_r.annotate(f"{s}x", (b, s), fontsize=9, fontweight="bold", color=c,
+                       xytext=(5, 5), textcoords="offset points")
+
+ax2.set_xlabel("Corpus size (B docs)")
+ax2.set_ylabel("Latency (ms)")
+ax2_r.set_ylabel("Speedup (×)", color=C_SPEEDUP)
+ax2_r.tick_params(axis="y", colors=C_SPEEDUP)
+ax2_r.spines["right"].set_visible(True)
+ax2_r.spines["right"].set_color(C_SPEEDUP)
+ax2.set_title("Scaling with Corpus Size\n(solid=Flash, dashed=Naive)", fontsize=13, fontweight="bold", pad=12)
+ax2.legend(loc="upper left", fontsize=8)
+ax2.grid(axis="y", alpha=0.2)
+
+# ═══════════════════════════════════════════════════════════════════
+# Panel 3: Memory — B on x-axis, naive grows, flash stays flat
+# ═══════════════════════════════════════════════════════════════════
 ax3 = fig.add_subplot(2, 2, 3)
-ax3.set_facecolor(BG_COLOR)
-q8 = data["int8"]
-labels_q = [d["label"] for d in q8]
-naive_q = [d["naive_ms"] for d in q8]
-flash_q = [d["flash_ms"] for d in q8]
-sp_q = [d["speedup"] for d in q8]
+ax3.set_facecolor(BG)
 
-x = np.arange(len(labels_q)); w = 0.32
-ax3.bar(x - w/2, naive_q, w, label="Naive FP32", color=NAIVE_COLOR, edgecolor="white", lw=0.8, zorder=3)
-ax3.bar(x + w/2, flash_q, w, label="Flash Q8 (fused)", color=Q8_COLOR, edgecolor="white", lw=0.8, zorder=3)
+mem = data["sweep_mem"]
+for tag, style in tag_style.items():
+    pts = sorted([d for d in mem if d["tag"] == tag], key=lambda d: d["B"])
+    if not pts:
+        continue
+    Bs = [d["B"] for d in pts]
+    naive_gb = [d["naive_gb"] for d in pts]
+    flash_gb = [d["flash_gb"] for d in pts]
+    c = style["color"]
 
-for i, s in enumerate(sp_q):
-    ymax = max(naive_q[i], flash_q[i])
-    ax3.text(i, ymax * 1.08, f"{s}x", ha="center", fontsize=13, fontweight="bold", color=Q8_COLOR, zorder=4)
+    ax3.plot(Bs, naive_gb, '--', color=c, alpha=0.5, lw=2, marker='s', markersize=4)
+    ax3.plot(Bs, flash_gb, '-', color=c, lw=2.5, marker='o', markersize=5, label=style["label"])
 
-ax3.set_ylabel("Latency (ms)")
-ax3.set_title("INT8 Fused Dequantization", fontsize=14, fontweight="bold", pad=10)
-ax3.set_xticks(x); ax3.set_xticklabels(labels_q, fontsize=9)
-ax3.legend(loc="upper left", fontsize=9)
-ax3.set_ylim(0, max(naive_q) * 1.25)
-ax3.grid(axis="y", alpha=0.3, zorder=0)
+    # Annotate ratio at largest B
+    if naive_gb[-1] > 0 and flash_gb[-1] > 0:
+        ratio = naive_gb[-1] / max(flash_gb[-1], 0.001)
+        ax3.annotate(f"{ratio:.0f}×\nless",
+                     (Bs[-1], naive_gb[-1]),
+                     fontsize=9, fontweight="bold", color=c,
+                     xytext=(10, -5), textcoords="offset points",
+                     arrowprops=dict(arrowstyle="->", color=c, alpha=0.5))
 
-# ── Panel 4: Batched throughput ──
+ax3.set_xlabel("Corpus size (B docs)")
+ax3.set_ylabel("Peak GPU Memory (GB)")
+ax3.set_title("Memory: Naive Grows, Flash Stays Flat\n(solid=Flash, dashed=Naive)", fontsize=13, fontweight="bold", pad=12)
+ax3.legend(loc="upper left", fontsize=8)
+ax3.grid(axis="y", alpha=0.2)
+
+# ═══════════════════════════════════════════════════════════════════
+# Panel 4: INT8 — grouped by B, comparing naive_fp32 vs flash_fp16 vs flash_q8
+# ═══════════════════════════════════════════════════════════════════
 ax4 = fig.add_subplot(2, 2, 4)
-ax4.set_facecolor(BG_COLOR)
-bat = data["batched"]
-labels_b = [d["label"] for d in bat]
-naive_b = [d["naive_ms"] for d in bat]
-flash_b = [d["flash_ms"] for d in bat]
-sp_b = [d["speedup"] for d in bat]
-tp_b = [d["pairs_per_sec"] for d in bat]
+ax4.set_facecolor(BG)
 
-x = np.arange(len(labels_b)); w = 0.32
-ax3b = ax4.bar(x - w/2, naive_b, w, label="Naive loop", color=NAIVE_COLOR, edgecolor="white", lw=0.8, zorder=3)
-ax4b = ax4.bar(x + w/2, flash_b, w, label="Flash batched", color=FLASH_COLOR, edgecolor="white", lw=0.8, zorder=3)
+int8 = data["sweep_int8"]
+for tag, style in [("textual", tag_style["textual"]), ("long_doc", tag_style["long_doc"])]:
+    pts = sorted([d for d in int8 if d["tag"] == tag], key=lambda d: d["B"])
+    if not pts:
+        continue
+    Bs = [d["B"] for d in pts]
+    naive = [d["naive_fp32_ms"] for d in pts]
+    flash_fp16 = [d["flash_fp16_ms"] for d in pts]
+    flash_q8 = [d["flash_q8_ms"] for d in pts]
+    c = style["color"]
 
-for i, (s, tp) in enumerate(zip(sp_b, tp_b)):
-    ymax = max(naive_b[i], flash_b[i])
-    ax4.text(i, ymax * 1.08, f"{s}x", ha="center", fontsize=13, fontweight="bold", color=FLASH_COLOR, zorder=4)
-    ax4.text(i, ymax * 1.20, f"{tp}M pairs/s", ha="center", fontsize=9, color="#666", zorder=4)
+    ax4.plot(Bs, naive, '--', color=c, alpha=0.4, lw=1.5, marker='s', markersize=4)
+    ax4.plot(Bs, flash_fp16, '-', color=c, lw=2, marker='o', markersize=5, label=f"Flash FP16 ({tag})")
+    ax4.plot(Bs, flash_q8, '-', color=c, lw=2, marker='D', markersize=5, alpha=0.7,
+             linestyle='-.', label=f"Flash Q8 ({tag})")
 
+    # Annotate: Q8 has same speed as FP16
+    ax4.annotate("2× compression\nsame speed",
+                 (Bs[-1], flash_q8[-1]),
+                 fontsize=8, color=C_Q8, fontweight="bold",
+                 xytext=(10, 10), textcoords="offset points")
+
+ax4.set_xlabel("Corpus size (B docs)")
 ax4.set_ylabel("Latency (ms)")
-ax4.set_title("Batched Multi-Query Throughput", fontsize=14, fontweight="bold", pad=10)
-ax4.set_xticks(x); ax4.set_xticklabels(labels_b, fontsize=9)
-ax4.legend(loc="upper left", fontsize=9)
-ax4.set_ylim(0, max(naive_b) * 1.35)
-ax4.grid(axis="y", alpha=0.3, zorder=0)
+ax4.set_title("INT8 Fused Dequantization\n(dashed=Naive FP32, solid=Flash FP16, dash-dot=Flash Q8)", fontsize=13, fontweight="bold", pad=12)
+ax4.legend(loc="upper left", fontsize=8)
+ax4.grid(axis="y", alpha=0.2)
+
+# ═══════════════════════════════════════════════════════════════════
+# Global legend
+# ═══════════════════════════════════════════════════════════════════
+legend_elements = [
+    Line2D([0], [0], color="gray", lw=2, linestyle="--", label="Naive PyTorch"),
+    Line2D([0], [0], color="gray", lw=2.5, linestyle="-", label="Flash-MaxSim"),
+    Line2D([0], [0], color=C_SPEEDUP, lw=1.5, linestyle=":", label="Speedup (right axis)"),
+]
+fig.legend(handles=legend_elements, loc="lower center", ncol=3, fontsize=11,
+           frameon=True, fancybox=True, shadow=False, bbox_to_anchor=(0.5, 0.01))
 
 # ── Save ──
-plt.tight_layout(rect=[0, 0, 1, 0.92])
-out = "benchmarks/flash_maxsim_benchmarks.png"
-fig.savefig(out, dpi=150, bbox_inches="tight", facecolor="white")
-print(f"\nSaved: {out}")
-
-# Also save a smaller version for README
-fig.savefig("benchmarks/flash_maxsim_benchmarks_small.png", dpi=100, bbox_inches="tight", facecolor="white")
-print("Saved: benchmarks/flash_maxsim_benchmarks_small.png")
-
+plt.tight_layout(rect=[0, 0.04, 1, 0.92])
+out_hi = "benchmarks/flash_maxsim_benchmarks.png"
+out_lo = "benchmarks/flash_maxsim_benchmarks_small.png"
+fig.savefig(out_hi, dpi=150, bbox_inches="tight", facecolor="white")
+fig.savefig(out_lo, dpi=100, bbox_inches="tight", facecolor="white")
+print(f"\nSaved: {out_hi}")
+print(f"Saved: {out_lo}")
 plt.show()
