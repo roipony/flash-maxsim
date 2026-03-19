@@ -110,9 +110,33 @@ for Lq, Ld, tag in configs:
             print(f"  {tag:10s} B={B:5d}: skip (D={d_gb:.1f}GB exceeds GPU)")
             continue
 
+        # Check total memory needed: D_fp16 + D_fp32 + Q_fp32 + sim_matrix
+        sim_gb = B * Lq * Ld * 4 / 1e9
+        total_needed = d_gb + (B * Ld * 128 * 4 / 1e9) + sim_gb  # D_fp32 + sim
+        if total_needed > gpu_mem_gb * 0.85:
+            # Skip naive, use theoretical sim size
+            Q = F.normalize(torch.randn(1, Lq, 128, device='cuda', dtype=torch.float16), dim=-1)
+            D = F.normalize(torch.randn(B, Ld, 128, device='cuda', dtype=torch.float16), dim=-1)
+            naive_gb = sim_gb
+
+            torch.cuda.reset_peak_memory_stats()
+            base = torch.cuda.memory_allocated()
+            try:
+                _ = flash_maxsim_batched(Q, D, shared_docs=True); torch.cuda.synchronize()
+                flash_gb = (torch.cuda.max_memory_allocated() - base) / 1e9
+                del _
+            except (RuntimeError, Exception):
+                flash_gb = 0.0001
+            torch.cuda.empty_cache()
+
+            ratio = max(1, naive_gb / max(flash_gb, 0.001))
+            print(f"  {tag:10s} B={B:5d}: naive={naive_gb:6.2f}GB (theoretical)  flash={flash_gb:.4f}GB  {ratio:.0f}x")
+            sweep_mem.append({"Lq": Lq, "Ld": Ld, "B": B, "tag": tag, "naive_gb": round(naive_gb, 4), "flash_gb": round(flash_gb, 4), "ratio": round(ratio, 0)})
+            del Q, D; torch.cuda.empty_cache()
+            continue
+
         Q = F.normalize(torch.randn(1, Lq, 128, device='cuda', dtype=torch.float16), dim=-1)
         D = F.normalize(torch.randn(B, Ld, 128, device='cuda', dtype=torch.float16), dim=-1)
-        sim_gb = B * Lq * Ld * 4 / 1e9
 
         # Naive memory
         torch.cuda.synchronize(); torch.cuda.reset_peak_memory_stats()
