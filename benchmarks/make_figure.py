@@ -50,7 +50,6 @@ TAG_LABELS = {
     "visual":   "Visual (Lq=1024, Ld=1024)",
 }
 
-C_SPEEDUP = "#FF8F00"
 BG = "#F8F9FA"
 
 fig = plt.figure(figsize=(20, 12), facecolor="white")
@@ -80,9 +79,7 @@ ax1.text(200, 0.97, "Textual", ha="center", fontsize=11, color="#1565C0", alpha=
 ax1.text(750, 0.97, "Visual / Long-doc", ha="center", fontsize=11, color="#E65100", alpha=0.6,
          fontweight="bold", transform=ax1.get_xaxis_transform(), va="top")
 
-# Key Ld points where we annotate speedup
-ANNOTATE_LDS = {128, 512, 1024}
-
+# Only annotate speedup at rightmost point (Ld=1024) to avoid overlap
 for Lq in lq_values:
     pts = sorted([d for d in sweep if d["Lq"] == Lq], key=lambda d: d["Ld"])
     lds = [d["Ld"] for d in pts]
@@ -91,17 +88,15 @@ for Lq in lq_values:
     speedup = [d["speedup"] for d in pts]
     c = LQ_COLORS.get(Lq, "#333")
 
-    ax1.plot(lds, naive, '--', color=c, alpha=0.45, lw=2.5)
+    ax1.plot(lds, naive, '--', color=c, alpha=0.7, lw=2.5)
     ax1.plot(lds, flash, '-', color=c, lw=3.5, marker='o', markersize=7,
              markeredgecolor="white", markeredgewidth=1, label=f"Lq={Lq}", zorder=5)
 
-    # Annotate speedup at key Ld points
-    for i, ld in enumerate(lds):
-        if ld in ANNOTATE_LDS:
-            ax1.annotate(f"{speedup[i]}x", (ld, flash[i]),
-                         fontsize=9, fontweight="bold", color=c, ha="center",
-                         xytext=(0, -14), textcoords="offset points",
-                         bbox=dict(boxstyle="round,pad=0.15", fc="white", ec=c, alpha=0.8, lw=0.8))
+    # Annotate speedup only at rightmost point
+    ax1.annotate(f"{speedup[-1]}x", (lds[-1], flash[-1]),
+                 fontsize=10, fontweight="bold", color=c, ha="left",
+                 xytext=(8, 0), textcoords="offset points",
+                 bbox=dict(boxstyle="round,pad=0.15", fc="white", ec=c, alpha=0.85, lw=0.8))
 
 ax1.set_yscale("log")
 ax1.set_xlabel("Document length (Ld)", fontsize=12)
@@ -110,7 +105,7 @@ ax1.set_title("Single Query · Vary Sequence Length (B=1000)\nsolid = Flash, das
               fontsize=14, fontweight="bold", pad=14)
 ax1.legend(loc="upper left", fontsize=10, title="Query length", title_fontsize=11,
            framealpha=0.9, edgecolor="#ccc")
-ax1.set_xlim(100, 1080)
+ax1.set_xlim(100, 1120)
 ax1.grid(axis="y", alpha=0.3, which="both")
 
 # ═══════════════════════════════════════════════════════════════════
@@ -121,9 +116,7 @@ ax2.set_facecolor(BG)
 
 corpus = data["sweep_corpus"]
 
-# Key B points to annotate speedup
-ANNOTATE_BS = {500, 2000, 5000}
-
+# Annotate speedup only at rightmost B point
 for tag in ["textual", "long_doc", "visual"]:
     pts = sorted([d for d in corpus if d["tag"] == tag], key=lambda d: d["B"])
     Bs = [d["B"] for d in pts]
@@ -134,17 +127,18 @@ for tag in ["textual", "long_doc", "visual"]:
 
     valid_naive = [(b, n) for b, n in zip(Bs, naive) if n == n]
     if valid_naive:
-        ax2.plot(*zip(*valid_naive), '--', color=c, alpha=0.45, lw=2.5)
+        ax2.plot(*zip(*valid_naive), '--', color=c, alpha=0.7, lw=2.5)
     ax2.plot(Bs, flash, '-', color=c, lw=3.5, marker='o', markersize=7,
              markeredgecolor="white", markeredgewidth=1, label=TAG_LABELS[tag], zorder=5)
 
-    # Annotate speedup at key B points
-    for i, b in enumerate(Bs):
-        if b in ANNOTATE_BS and speedup[i] == speedup[i]:  # not NaN
-            ax2.annotate(f"{speedup[i]}x", (b, flash[i]),
-                         fontsize=9, fontweight="bold", color=c, ha="center",
-                         xytext=(0, -14), textcoords="offset points",
-                         bbox=dict(boxstyle="round,pad=0.15", fc="white", ec=c, alpha=0.8, lw=0.8))
+    # Annotate speedup at rightmost valid point
+    valid_sp = [(b, s, f) for b, s, f in zip(Bs, speedup, flash) if s == s]
+    if valid_sp:
+        b, s, f = valid_sp[-1]
+        ax2.annotate(f"{s}x", (b, f),
+                     fontsize=10, fontweight="bold", color=c, ha="left",
+                     xytext=(8, 0), textcoords="offset points",
+                     bbox=dict(boxstyle="round,pad=0.15", fc="white", ec=c, alpha=0.85, lw=0.8))
 
 ax2.set_yscale("log")
 ax2.set_xlabel("Corpus size (B docs)", fontsize=12)
@@ -170,7 +164,7 @@ for tag in ["textual", "long_doc", "visual"]:
     flash_gb = [max(d["flash_gb"], 0.001) for d in pts]  # avoid log(0)
     c = TAG_COLORS[tag]
 
-    ax3.plot(Bs, naive_gb, '--', color=c, alpha=0.5, lw=3, marker='s', markersize=6,
+    ax3.plot(Bs, naive_gb, '--', color=c, alpha=0.7, lw=3, marker='s', markersize=6,
              markeredgecolor="white", markeredgewidth=1)
     ax3.plot(Bs, flash_gb, '-', color=c, lw=3.5, marker='o', markersize=7,
              markeredgecolor="white", markeredgewidth=1, label=TAG_LABELS[tag], zorder=5)
@@ -189,7 +183,7 @@ ax3.set_xlabel("Corpus size (B docs)", fontsize=12)
 ax3.set_ylabel("Peak GPU Memory (GB, log scale)", fontsize=12)
 ax3.set_title("Memory: Naive Grows, Flash Stays Flat\nsolid = Flash, dashed = Naive",
               fontsize=14, fontweight="bold", pad=14)
-ax3.legend(loc="upper left", fontsize=10, framealpha=0.9, edgecolor="#ccc")
+ax3.legend(loc="lower right", fontsize=10, framealpha=0.9, edgecolor="#ccc")
 ax3.grid(axis="y", alpha=0.3, which="both")
 
 # ═══════════════════════════════════════════════════════════════════
@@ -209,7 +203,7 @@ for tag in ["textual", "long_doc"]:
     flash_q8 = [d["flash_q8_ms"] for d in pts]
     c = TAG_COLORS[tag]
 
-    ax4.plot(Bs, naive, '--', color=c, alpha=0.45, lw=2.5, marker='s', markersize=5,
+    ax4.plot(Bs, naive, '--', color=c, alpha=0.7, lw=2.5, marker='s', markersize=5,
              markeredgecolor="white", markeredgewidth=1)
     ax4.plot(Bs, flash_fp16, '-', color=c, lw=3.5, marker='o', markersize=7,
              markeredgecolor="white", markeredgewidth=1, label=f"Flash FP16 ({tag})", zorder=5)
