@@ -103,7 +103,7 @@ for Lq in lq_values:
 ax1.set_yscale("log")
 ax1.set_xlabel("Document length (Ld)", fontsize=12)
 ax1.set_ylabel("Latency (ms, log scale)", fontsize=12)
-ax1.set_title("Speedup vs Sequence Length (B=1000)\nsolid = Flash, dashed = Naive",
+ax1.set_title("Single Query · Vary Sequence Length (B=1000)\nsolid = Flash, dashed = Naive",
               fontsize=14, fontweight="bold", pad=14)
 ax1.legend(loc="upper left", fontsize=10, title="Query length", title_fontsize=11,
            framealpha=0.9, edgecolor="#ccc")
@@ -146,7 +146,7 @@ for tag in ["textual", "long_doc", "visual"]:
 ax2.set_yscale("log")
 ax2.set_xlabel("Corpus size (B docs)", fontsize=12)
 ax2.set_ylabel("Latency (ms, log scale)", fontsize=12)
-ax2.set_title("Scaling with Corpus Size\nsolid = Flash, dashed = Naive",
+ax2.set_title("Single Query · Scaling with Corpus Size\nsolid = Flash, dashed = Naive",
               fontsize=14, fontweight="bold", pad=14)
 ax2.legend(loc="upper left", fontsize=10, framealpha=0.9, edgecolor="#ccc")
 ax2.grid(axis="y", alpha=0.3, which="both")
