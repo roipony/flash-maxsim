@@ -2,6 +2,10 @@
 
 Fused Triton GPU kernel for ColBERT/ColPali MaxSim scoring. Up to **13x faster**, **143x less memory**. The similarity matrix never touches HBM.
 
+**Requirements:** NVIDIA GPU (Ampere or newer recommended), CUDA, PyTorch >= 2.0, Triton >= 3.4.
+
+Tested on: H100 80GB, A100, V100.
+
 ## Get Started (copy-paste)
 
 ```bash
