@@ -153,8 +153,8 @@ examples/
 **IBM Research Israel**
 
 - Roi Pony — [roi.pony@ibm.com](mailto:roi.pony@ibm.com)
-- Idan Friedman — [idan.friedman@ibm.com](mailto:idan.friedman@ibm.com)
 - Adi Raz Goldfarb — [adi.raz@ibm.com](mailto:adi.raz@ibm.com)
+- Idan Friedman — [idan.friedman@ibm.com](mailto:idan.friedman@ibm.com)
 - Udi Barzelay — [udib@il.ibm.com](mailto:udib@il.ibm.com)
 
 ## Citation
