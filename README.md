@@ -148,13 +148,18 @@ examples/
   demo_notebook.ipynb    # interactive notebook with plots
 ```
 
+## Authors
+
+**IBM Research Israel**
+
+- Roi Pony — [roi.pony@ibm.com](mailto:roi.pony@ibm.com)
+- Idan Friedman — [idan.friedman@ibm.com](mailto:idan.friedman@ibm.com)
+- Adi Raz Goldfarb — [adi.raz@ibm.com](mailto:adi.raz@ibm.com)
+- Udi Barzelay — [udib@il.ibm.com](mailto:udib@il.ibm.com)
+
 ## Citation
 
 Coming soon.
-
-## Contact
-
-Roi Pony — [roi.pony@ibm.com](mailto:roi.pony@ibm.com)
 
 ## License
 
