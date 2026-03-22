@@ -53,3 +53,37 @@ def test_train():
     s = flash_maxsim_train(Q, D)
     s.sum().backward()
     assert Q.grad is not None
+
+
+@pytest.mark.parametrize("d", [256, 512, 1024, 2048])
+def test_large_embedding_dim(d):
+    from flash_maxsim import flash_maxsim, maxsim_naive
+    Q, D = _sim(20, 32, 128, d)
+    ref = maxsim_naive(Q, D)
+    out = flash_maxsim(Q, D)
+    assert torch.allclose(ref, out, atol=1.0), f"d={d}: max err={((ref-out).abs().max().item()):.4f}"
+
+
+@pytest.mark.parametrize("keep", [0.25, 0.5, 0.75])
+def test_sparse_maxsim(keep):
+    from flash_maxsim import flash_maxsim_sparse, maxsim_sparse_naive
+    Q, D = _sim(50, 32, 300, 128)
+    K = max(1, int(32 * keep))
+    importance = torch.randn(50, 32, device="cuda")
+    indices = importance.topk(K, dim=1).indices.to(torch.int32)
+    ref = maxsim_sparse_naive(Q, D, indices)
+    out = flash_maxsim_sparse(Q, D, indices)
+    assert torch.allclose(ref, out, atol=1.0), f"keep={keep}: max err={((ref-out).abs().max().item()):.4f}"
+
+
+@pytest.mark.parametrize("d", [256, 512, 1024])
+def test_large_dim_int8(d):
+    from flash_maxsim import flash_maxsim_int8, flash_maxsim, quantize_int8
+    Q, D = _sim(20, 32, 128, d)
+    D_q, s, m = quantize_int8(D)
+    scores_fp = flash_maxsim(Q, D)
+    scores_q8 = flash_maxsim_int8(Q, D_q, s, m)
+    # INT8 has quantization error, check top-3 rankings match
+    fp_rank = scores_fp.argsort(descending=True)[:3]
+    q8_rank = scores_q8.argsort(descending=True)[:3]
+    assert (fp_rank == q8_rank).all(), f"d={d}: ranking mismatch fp={fp_rank.tolist()} q8={q8_rank.tolist()}"

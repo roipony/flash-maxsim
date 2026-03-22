@@ -39,17 +39,19 @@ def dequantize_int8(D_uint8: torch.Tensor, scales: torch.Tensor, mins: torch.Ten
 
 @triton.autotune(
     configs=[
-        triton.Config({"BLOCK_Q": 16, "BLOCK_D": 32}, num_warps=4, num_stages=2),
+        triton.Config({"BLOCK_Q": 16, "BLOCK_D": 16}, num_warps=2, num_stages=2),
+        triton.Config({"BLOCK_Q": 16, "BLOCK_D": 32}, num_warps=2, num_stages=2),
+        triton.Config({"BLOCK_Q": 32, "BLOCK_D": 32}, num_warps=4, num_stages=2),
         triton.Config({"BLOCK_Q": 16, "BLOCK_D": 64}, num_warps=4, num_stages=2),
         triton.Config({"BLOCK_Q": 32, "BLOCK_D": 64}, num_warps=4, num_stages=2),
         triton.Config({"BLOCK_Q": 32, "BLOCK_D": 128}, num_warps=8, num_stages=2),
     ],
-    key=["Lq", "Ld", "d"],
+    key=["Lq", "Ld", "d_pad"],
 )
 @triton.jit
 def _maxsim_int8_kernel(
     Q_ptr, D_ptr, scales_ptr, mins_ptr, lengths_ptr, scores_ptr,
-    Lq: tl.constexpr, Ld: tl.constexpr, d: tl.constexpr,
+    Lq: tl.constexpr, Ld: tl.constexpr, d: tl.constexpr, d_pad: tl.constexpr,
     stride_d_b, stride_d_l, stride_d_d,
     stride_q_l, stride_q_d,
     stride_s_b, stride_s_l,
@@ -58,7 +60,8 @@ def _maxsim_int8_kernel(
     doc_id = tl.program_id(0)
     doc_len = tl.load(lengths_ptr + doc_id).to(tl.int32)
 
-    k_off = tl.arange(0, d)
+    k_off = tl.arange(0, d_pad)
+    k_mask = k_off < d
     score_acc = tl.zeros([], dtype=tl.float32)
 
     for q_start in tl.static_range(0, Lq, BLOCK_Q):
@@ -67,7 +70,7 @@ def _maxsim_int8_kernel(
 
         Q_block = tl.load(
             Q_ptr + q_off[:, None] * stride_q_l + k_off[None, :] * stride_q_d,
-            mask=q_valid[:, None], other=0.0,
+            mask=q_valid[:, None] & k_mask[None, :], other=0.0,
         ).to(tl.float16)
 
         m = tl.full([BLOCK_Q], float("-inf"), dtype=tl.float32)
@@ -78,7 +81,7 @@ def _maxsim_int8_kernel(
 
             D_raw = tl.load(
                 D_ptr + doc_id * stride_d_b + d_off[:, None] * stride_d_l + k_off[None, :] * stride_d_d,
-                mask=d_valid[:, None], other=0,
+                mask=d_valid[:, None] & k_mask[None, :], other=0,
             )
             sc = tl.load(scales_ptr + doc_id * stride_s_b + d_off * stride_s_l, mask=d_valid, other=1.0).to(tl.float16)
             mn = tl.load(mins_ptr + doc_id * stride_s_b + d_off * stride_s_l, mask=d_valid, other=0.0).to(tl.float16)
@@ -127,9 +130,11 @@ def flash_maxsim_int8(
     mins = mins.contiguous().half()
     scores = torch.empty(B, device=Q.device, dtype=torch.float32)
 
+    from .flash_maxsim import _next_pow2
+    d_pad = _next_pow2(d)
     _maxsim_int8_kernel[(B,)](
         Q, D_uint8, scales, mins, doc_lengths, scores,
-        Lq, Ld, d,
+        Lq, Ld, d, d_pad,
         D_uint8.stride(0), D_uint8.stride(1), D_uint8.stride(2),
         Q.stride(0), Q.stride(1),
         scales.stride(0), scales.stride(1),
