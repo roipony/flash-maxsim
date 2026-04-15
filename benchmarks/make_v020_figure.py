@@ -97,40 +97,33 @@ ax.set_xticks(x)
 ax.set_xticklabels(labels, fontsize=9)
 ax.legend(fontsize=10, loc='upper left')
 
-# ── Panel 4: Varlen speedup (vs padded naive) ──
+# ── Panel 4: Varlen — bar chart ──
 ax = axes[3]
 
-# Verified data from bench_full (varlen vs padded batched naive)
-varlen_data = {
-    "ColBERT-skewed\n(avg_Ld~49)": {
-        "Ns": [1000, 5000, 20000, 100000],
-        "speedups": [1.2, 2.6, 4.0, 4.8],
-        "color": "#1565C0",
-    },
-    "ColPali-uniform\n(Ld~U[256,1024])": {
-        "Ns": [500, 2000],
-        "speedups": [3.9, 1.6],
-        "color": "#C62828",
-    },
-    "ColPali-skewed\n(avg_Ld~196)": {
-        "Ns": [500, 2000, 10000],
-        "speedups": [2.0, 1.9, 2.8],
-        "color": "#E65100",
-    },
-}
+labels_vl = [
+    'ColBERT\nskewed\nN=100K',
+    'ColBERT\nuniform\nN=20K',
+    'ColPali\nuniform\nN=500',
+    'ColPali\nskewed\nN=10K',
+]
+speedups_vl = [4.8, 2.1, 3.9, 2.8]
+d_saved = [39, 42, 37, 22]
+colors_vl = ['#1565C0', '#42A5F5', '#C62828', '#E65100']
 
-for label, vd in varlen_data.items():
-    ax.plot(vd["Ns"], vd["speedups"], 'o-', color=vd["color"], label=label, lw=2, ms=6)
-    ax.annotate(f'{vd["speedups"][-1]:.1f}x', (vd["Ns"][-1], vd["speedups"][-1]),
-                textcoords="offset points", xytext=(8, 0), fontsize=9,
-                fontweight='bold', color=vd["color"])
+x = np.arange(len(labels_vl))
+bars = ax.bar(x, speedups_vl, color=colors_vl, edgecolor='black', lw=0.5, alpha=0.9)
+for i, (bar, sp, ds) in enumerate(zip(bars, speedups_vl, d_saved)):
+    ax.text(bar.get_x() + bar.get_width()/2, sp + 0.12, f'{sp:.1f}x',
+            ha='center', fontsize=11, fontweight='bold')
+    ax.text(bar.get_x() + bar.get_width()/2, sp/2, f'{ds}%\nsaved',
+            ha='center', fontsize=8, color='white', fontweight='bold')
 
-ax.set_xscale('log')
-ax.set_xlabel('Number of pairs (N)')
 ax.set_ylabel('Speedup vs padded naive')
 ax.set_title('Variable-length pairs\n(zero padding waste)', fontweight='bold')
-ax.legend(fontsize=8, loc='upper left')
+ax.set_xticks(x)
+ax.set_xticklabels(labels_vl, fontsize=8)
 ax.axhline(1, color='gray', ls='--', lw=0.8)
+ax.set_ylim(0, 6)
 
 plt.tight_layout()
 outfile = "benchmarks/flash_maxsim_benchmarks.png"
