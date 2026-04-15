@@ -35,7 +35,7 @@ TAG_LABELS = {
     "short_d":  "ColPali-ShortD (Lq=1024, Ld=512)",
 }
 
-fig, axes = plt.subplots(1, 3, figsize=(17, 5))
+fig, axes = plt.subplots(1, 4, figsize=(22, 5))
 
 # ── Panel 1: Speedup vs FP16 naive ──
 ax = axes[0]
@@ -96,6 +96,41 @@ ax.set_title('Memory: similarity matrix\n(eliminated by flash)', fontweight='bol
 ax.set_xticks(x)
 ax.set_xticklabels(labels, fontsize=9)
 ax.legend(fontsize=10, loc='upper left')
+
+# ── Panel 4: Varlen speedup (vs padded naive) ──
+ax = axes[3]
+
+# Verified data from bench_full (varlen vs padded batched naive)
+varlen_data = {
+    "ColBERT-skewed\n(avg_Ld~49)": {
+        "Ns": [1000, 5000, 20000, 100000],
+        "speedups": [1.2, 2.6, 4.0, 4.8],
+        "color": "#1565C0",
+    },
+    "ColPali-uniform\n(Ld~U[256,1024])": {
+        "Ns": [500, 2000],
+        "speedups": [3.9, 1.6],
+        "color": "#C62828",
+    },
+    "ColPali-skewed\n(avg_Ld~196)": {
+        "Ns": [500, 2000, 10000],
+        "speedups": [2.0, 1.9, 2.8],
+        "color": "#E65100",
+    },
+}
+
+for label, vd in varlen_data.items():
+    ax.plot(vd["Ns"], vd["speedups"], 'o-', color=vd["color"], label=label, lw=2, ms=6)
+    ax.annotate(f'{vd["speedups"][-1]:.1f}x', (vd["Ns"][-1], vd["speedups"][-1]),
+                textcoords="offset points", xytext=(8, 0), fontsize=9,
+                fontweight='bold', color=vd["color"])
+
+ax.set_xscale('log')
+ax.set_xlabel('Number of pairs (N)')
+ax.set_ylabel('Speedup vs padded naive')
+ax.set_title('Variable-length pairs\n(zero padding waste)', fontweight='bold')
+ax.legend(fontsize=8, loc='upper left')
+ax.axhline(1, color='gray', ls='--', lw=0.8)
 
 plt.tight_layout()
 outfile = "benchmarks/flash_maxsim_benchmarks.png"
