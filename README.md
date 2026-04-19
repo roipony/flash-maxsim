@@ -67,8 +67,10 @@ scores = flash_maxsim(Q, D_packed, doc_lengths=cu_seqlens)
 
 | Regime | N | Speedup | Padding saved |
 |---|---|---|---|
-| ColBERT skewed (avg_Ld≈49) | 100K | **4.8x** | 39% |
-| ColPali variable | 500 | **3.9x** | 37% |
+| ColBERT skewed (avg_Ld≈49) | 100K | **5.1x** | 39% |
+| ColBERT uniform | 100K | **2.7x** | 42% |
+| ColPali uniform | 500 | **4.2x** | 37% |
+| ColPali skewed | 5K | **3.9x** | 19% |
 
 ### 5. INT8 index — half storage, faster, more precise
 

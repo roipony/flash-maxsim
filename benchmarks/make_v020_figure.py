@@ -102,12 +102,12 @@ ax = axes[3]
 
 labels_vl = [
     'ColBERT\nskewed\nN=100K',
-    'ColBERT\nuniform\nN=20K',
+    'ColBERT\nuniform\nN=100K',
     'ColPali\nuniform\nN=500',
-    'ColPali\nskewed\nN=10K',
+    'ColPali\nskewed\nN=5K',
 ]
-speedups_vl = [4.8, 2.1, 3.9, 2.8]
-d_saved = [39, 42, 37, 22]
+speedups_vl = [5.1, 2.7, 4.2, 3.9]
+d_saved = [39, 42, 37, 19]
 colors_vl = ['#1565C0', '#42A5F5', '#C62828', '#E65100']
 
 x = np.arange(len(labels_vl))
@@ -123,7 +123,7 @@ ax.set_title('Variable-length pairs\n(zero padding waste)', fontweight='bold')
 ax.set_xticks(x)
 ax.set_xticklabels(labels_vl, fontsize=8)
 ax.axhline(1, color='gray', ls='--', lw=0.8)
-ax.set_ylim(0, 6)
+ax.set_ylim(0, 6.5)
 
 plt.tight_layout()
 outfile = "benchmarks/flash_maxsim_benchmarks.png"
