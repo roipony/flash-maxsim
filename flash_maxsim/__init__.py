@@ -1,8 +1,9 @@
 """Fused GPU kernel for ColBERT/ColPali MaxSim scoring."""
-__version__ = "0.2.0"
+__version__ = "0.2.1"
 
 # Core scoring
 from .flash_maxsim import flash_maxsim, flash_maxsim_batched, flash_maxsim_train
+from .flash_maxsim_batched_train import flash_maxsim_batched_train
 from .naive import maxsim_naive, maxsim_naive_fp32, maxsim_at_operator, maxsim_bmm
 from .naive import maxsim_chunked, maxsim_naive_batched, maxsim_naive_int8
 

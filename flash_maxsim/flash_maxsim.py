@@ -335,7 +335,10 @@ def _maxsim_bwd_dD_kernel(
 def _launch_fwd(Q, D, lengths, Nq, B, Lq, Ld, d, shared_docs, save_argmax, q_lengths=None):
     d_pad = _next_pow2(d)
     scores = torch.empty(Nq, B, device=Q.device, dtype=torch.float32)
-    argmax = torch.empty(Nq * B, Lq, device=Q.device, dtype=torch.int32) if save_argmax else Q  # dummy
+    # Zeros (not empty): forward kernel masks writes for padded query positions,
+    # so unwritten slots must default to an in-range value (0). Empty-init
+    # leaves garbage that crashes the invgrid backward's bincount.
+    argmax = torch.zeros(Nq * B, Lq, device=Q.device, dtype=torch.int32) if save_argmax else Q  # dummy
     use_q_lengths = q_lengths is not None
     # dummy q_lengths if not provided (not read by kernel when use_q_lengths=0)
     q_lengths_t = q_lengths if use_q_lengths else lengths
