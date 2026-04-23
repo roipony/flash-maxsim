@@ -188,7 +188,7 @@ def demo_int8():
 # ============================================================================
 
 def demo_training():
-    section("6. Training — flash_maxsim_train")
+    section("6. Training (single query) — flash_maxsim_train")
     from flash_maxsim import flash_maxsim_train
 
     Lq, d, B, Ld = 32, 128, 50, 100
@@ -203,7 +203,92 @@ def demo_training():
     print(f"Scores: {scores.shape}")
     print(f"Q gradient: {Q.grad.shape}, norm={Q.grad.norm().item():.4f}")
     print(f"D gradient: {D.grad.shape}, norm={D.grad.norm().item():.4f}")
-    print("Autograd works — use in contrastive/distillation training loops")
+    print("Autograd works — use in cross-encoder rerank training loops")
+
+
+# ============================================================================
+# 6b. Batched training: flash_maxsim_batched_train  (NEW in v0.2.1)
+#
+# For contrastive in-batch-negatives training. Replaces pylate's
+# `colbert_scores(Q_batch, D_batch).diagonal().sum().backward()` —
+# same math, same gradients, but never materializes the [Nq, B, Lq, Ld]
+# similarity matrix that vanilla autograd saves.
+# ============================================================================
+
+def demo_batched_training():
+    section("6b. Batched training (contrastive) — flash_maxsim_batched_train")
+    from flash_maxsim import flash_maxsim_batched_train
+
+    # -----------------------------------------------------------------------
+    # (1) ColBERT-scale contrastive: Lq=32, Ld=180, B=64
+    #     Small regime — used to show correctness. Memory parity here because
+    #     naive's sim matrix [Nq, B, Lq, Ld] is still small at this shape.
+    # -----------------------------------------------------------------------
+    print("  [ColBERT regime]   Nq=B=64, Lq=32, Ld=180, d=128")
+    Nq, B, Lq, Ld, d = 64, 64, 32, 180, 128
+    Q = torch.randn(Nq, Lq, d, device="cuda", dtype=torch.float16, requires_grad=True)
+    D = torch.randn(B,  Ld, d, device="cuda", dtype=torch.float16, requires_grad=True)
+    scores = flash_maxsim_batched_train(Q, D, shared_docs=True)  # [Nq, B]
+    scores.diagonal().sum().backward()                            # contrastive loss
+    print(f"    scores {tuple(scores.shape)}  grad_Q {tuple(Q.grad.shape)}  grad_D {tuple(D.grad.shape)}")
+
+    # Variable-length: mask padded query/doc tokens
+    q_lens = torch.randint(20, Lq + 1, (Nq,), dtype=torch.int32, device="cuda")
+    d_lens = torch.randint(50, Ld + 1, (B,),  dtype=torch.int32, device="cuda")
+    flash_maxsim_batched_train(
+        Q.detach().requires_grad_(True),
+        D.detach().requires_grad_(True),
+        shared_docs=True,
+        doc_lengths=d_lens, query_lengths=q_lens,
+    )
+    print(f"    varlen OK  (doc_lengths={list(d_lens[:3].tolist())}…  query_lengths={list(q_lens[:3].tolist())}…)")
+
+    # Knowledge distillation: each query owns K teacher docs → D:[Nq, B, Ld, d]
+    K = 8
+    Q_kd = torch.randn(Nq, Lq, d, device="cuda", dtype=torch.float16, requires_grad=True)
+    D_kd = torch.randn(Nq, K, Ld, d, device="cuda", dtype=torch.float16, requires_grad=True)
+    scores_kd = flash_maxsim_batched_train(Q_kd, D_kd, shared_docs=False)
+    print(f"    KD scores {tuple(scores_kd.shape)}  (shared_docs=False, per-query teacher docs)")
+
+    # -----------------------------------------------------------------------
+    # (2) ColPali-scale contrastive: Lq=Ld=1024, B=32 — THIS is where the
+    #     memory story actually shows up. Vanilla autograd would save an
+    #     [Nq, B, Lq, Ld] FP32 tensor ≈ 4 GB at this shape.
+    # -----------------------------------------------------------------------
+    print("\n  [ColPali regime]   Nq=B=32, Lq=Ld=1024, d=128")
+    Nq, B, Lq, Ld, d = 32, 32, 1024, 1024, 128
+    Q = torch.randn(Nq, Lq, d, device="cuda", dtype=torch.float16, requires_grad=True)
+    D = torch.randn(B,  Ld, d, device="cuda", dtype=torch.float16, requires_grad=True)
+
+    # Flash path
+    torch.cuda.reset_peak_memory_stats(); base = torch.cuda.memory_allocated()
+    scores = flash_maxsim_batched_train(Q, D, shared_docs=True)
+    scores.diagonal().sum().backward()
+    flash_peak_mb = (torch.cuda.max_memory_allocated() - base) / 1e6
+    gQ_flash = Q.grad.detach().clone(); gD_flash = D.grad.detach().clone()
+
+    # Naive autograd via einsum (matched precision — reduces in FP32)
+    Q.grad = None; D.grad = None
+    torch.cuda.reset_peak_memory_stats(); base = torch.cuda.memory_allocated()
+    S = torch.einsum("nqd,bld->nbql", Q, D).float()                  # [Nq, B, Lq, Ld]
+    S.max(dim=-1).values.sum(dim=-1).diagonal().sum().backward()
+    naive_peak_mb = (torch.cuda.max_memory_allocated() - base) / 1e6
+
+    # Correctness
+    import torch.nn.functional as F
+    gQ_cos = F.cosine_similarity(gQ_flash.float().flatten().unsqueeze(0),
+                                  Q.grad.float().flatten().unsqueeze(0)).item()
+    gD_cos = F.cosine_similarity(gD_flash.float().flatten().unsqueeze(0),
+                                  D.grad.float().flatten().unsqueeze(0)).item()
+    print(f"    grad_Q cos vs naive: {gQ_cos:.5f}   grad_D cos: {gD_cos:.5f}")
+    print(f"    scoring peak memory (fwd + bwd):")
+    print(f"      naive einsum:               {naive_peak_mb:>7.1f} MB   (stores [Nq, B, Lq, Ld])")
+    print(f"      flash_maxsim_batched_train: {flash_peak_mb:>7.1f} MB   (only argmax indices)")
+    print(f"      reduction:                  {naive_peak_mb/max(flash_peak_mb, 1e-6):>7.1f}×")
+    print()
+    print("    On a single 80 GB A100:")
+    print("      * naive OOMs at ColPali contrastive B≥128 (sim matrix > 100 GB)")
+    print("      * flash scales to B=256+ (only ~0.5 GB of argmax)")
 
 
 # ============================================================================
@@ -271,6 +356,7 @@ if __name__ == "__main__":
         demo_rerank,
         demo_int8,
         demo_training,
+        demo_batched_training,
         demo_performance,
     ]
 
