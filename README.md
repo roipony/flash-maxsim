@@ -99,13 +99,37 @@ Flash INT8×INT8 is **4.7x faster** than naive dequant, uses **half the storage*
 Full gradient support via saved argmax indices. Sparse backward — no full matrix in either direction:
 
 ```python
+# Single query (e.g. cross-encoder rerank training)
 from flash_maxsim import flash_maxsim_train
+scores = flash_maxsim_train(Q, D)              # Q: [Lq, d], D: [B, Ld, d]
+scores.sum().backward()                         # gradients to both Q and D
 
-scores = flash_maxsim_train(Q, D)  # Q: [Lq, d], D: [B, Ld, d]
-scores.sum().backward()            # gradients to both Q and D
+# Batched (contrastive / in-batch negatives — new in v0.2.1)
+from flash_maxsim import flash_maxsim_batched_train
+scores = flash_maxsim_batched_train(            # Q: [Nq, Lq, d], D: [B, Ld, d]
+    Q_batch, D, shared_docs=True,               #   shared_docs=True for contrastive
+    doc_lengths=d_lens, query_lengths=q_lens,   #   varlen — masks padded tokens
+)                                                # → scores [Nq, B]
+scores.diagonal().sum().backward()              # gradients to Q_batch and D
+
+# Knowledge distillation (each query has its own doc set)
+scores = flash_maxsim_batched_train(            # Q: [Nq, Lq, d], D: [Nq, B, Ld, d]
+    Q_batch, D_per_query, shared_docs=False,    # → scores [Nq, B]
+)
 ```
 
-Verified correct against naive backward (max gradient error < 0.001).
+The batched path uses an inverse-grid CSR backward (atomic-free, runs on
+tensor cores) when work is non-trivial, falling back to FP32-atomic scatter
+otherwise. Saved activations are O(Nq × B × Lq) argmax indices instead of
+the full O(Nq × B × Lq × Ld) similarity matrix that vanilla autograd would
+materialize — **95–205× less scoring memory** at typical contrastive shapes,
+**1.4–3.8× faster** full training step than `colbert_scores`-style baselines
+on A100, and **lifts the OOM ceiling 2×** (e.g. ColPali contrastive B=128
+becomes feasible on a single 80 GB A100).
+
+Verified bit-exact for grad_Q vs FP32 reference at fixed-length shapes;
+cosine similarity > 0.999 across all tested batched shapes; correct under
+variable-length inputs even when padded query positions hold non-zero values.
 
 ### 7. 800x more precise
 
@@ -166,13 +190,21 @@ scores = flash_maxsim_int8x8(Q, D_int8, scales)
 ### Training
 
 ```python
+# Single query
 from flash_maxsim import flash_maxsim_train
 
 Q = torch.randn(32, 128, device="cuda", dtype=torch.float16, requires_grad=True)
-D = torch.randn(100, 300, 128, device="cuda", dtype=torch.float16)
+D = torch.randn(100, 300, 128, device="cuda", dtype=torch.float16, requires_grad=True)
 scores = flash_maxsim_train(Q, D)
-loss = scores.sum()
-loss.backward()  # Q.grad computed via sparse argmax backward
+scores.sum().backward()                   # Q.grad and D.grad
+
+# Batched contrastive training (new in v0.2.1)
+from flash_maxsim import flash_maxsim_batched_train
+
+Q = torch.randn(64, 32, 128, device="cuda", dtype=torch.float16, requires_grad=True)
+D = torch.randn(64, 300, 128, device="cuda", dtype=torch.float16, requires_grad=True)
+scores = flash_maxsim_batched_train(Q, D, shared_docs=True)   # [64, 64] scores
+scores.diagonal().sum().backward()        # contrastive loss → grads
 ```
 
 ### Zero-Copy Reranking
@@ -223,13 +255,14 @@ Same principle as Flash Attention, but simpler: `max` is trivially composable ac
 | `flash_maxsim_int8` | Legacy: fused affine INT8 dequant+scoring |
 
 ### Training & Utilities
-| Function | Description |
-|---|---|
-| `flash_maxsim_train` | MaxSim with autograd backward (sparse argmax) |
-| `flash_maxsim_rerank_direct` | Zero-copy scoring from scattered batch tensor |
-| `pack_pairs` | Pack variable-length (Q, D) pairs into cu_seqlens format |
-| `pack_docs` | Pack variable-length docs for `flash_maxsim_packed` |
-| `maxsim_naive` | Pure PyTorch reference (FP16 einsum) |
+| Function | Signature | Description |
+|---|---|---|
+| `flash_maxsim_train` | `[Lq,d] × [B,Ld,d] → [B]` | Single-query MaxSim with autograd backward (sparse argmax) |
+| `flash_maxsim_batched_train` | `[Nq,Lq,d] × [B,Ld,d] → [Nq,B]` | **Batched** MaxSim with autograd — for contrastive in-batch negatives or KD; supports `shared_docs`, `doc_lengths`, `query_lengths` |
+| `flash_maxsim_rerank_direct` | scattered batch tensor → `[B]` | Zero-copy scoring from a serving model's output |
+| `pack_pairs` | list of (q, d) → packed | Variable-length (Q, D) pair packing into cu_seqlens format |
+| `pack_docs` | list of D → packed | Variable-length doc packing for `flash_maxsim_packed` |
+| `maxsim_naive` | `[Lq,d] × [B,Ld,d] → [B]` | Pure PyTorch reference (FP16 einsum) |
 
 ## Requirements
 
