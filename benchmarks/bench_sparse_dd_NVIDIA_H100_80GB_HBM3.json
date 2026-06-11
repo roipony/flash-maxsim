@@ -1,0 +1,102 @@
+{
+  "gpu": "NVIDIA H100 80GB HBM3",
+  "torch": "2.8.0+cu128",
+  "paths": [
+    "atomic",
+    "sparse_dd",
+    "auto"
+  ],
+  "rows": [
+    {
+      "name": "kd-small B32 K8 Ld180",
+      "layout": "nonshared",
+      "Nq": 32,
+      "B": 8,
+      "Lq": 32,
+      "Ld": 180,
+      "d": 128,
+      "atomic": {
+        "median_ms": 0.6283,
+        "std_ms": 0.5729,
+        "peak_gb": 0.0459
+      },
+      "sparse_dd": {
+        "median_ms": 0.9703,
+        "std_ms": 0.5496,
+        "peak_gb": 0.0459
+      },
+      "auto": {
+        "median_ms": 0.643,
+        "std_ms": 0.4484,
+        "peak_gb": 0.0459
+      }
+    },
+    {
+      "name": "colpali-neg B128 K8 Ld1030",
+      "layout": "nonshared",
+      "Nq": 128,
+      "B": 8,
+      "Lq": 32,
+      "Ld": 1030,
+      "d": 128,
+      "atomic": {
+        "median_ms": 1.7058,
+        "std_ms": 0.6534,
+        "peak_gb": 1.0099
+      },
+      "sparse_dd": {
+        "median_ms": 1.9763,
+        "std_ms": 0.7349,
+        "peak_gb": 1.0099
+      },
+      "auto": {
+        "median_ms": 1.7061,
+        "std_ms": 0.7038,
+        "peak_gb": 1.0099
+      }
+    },
+    {
+      "name": "colpali-neg B256 K16 Ld1030",
+      "layout": "nonshared",
+      "Nq": 256,
+      "B": 16,
+      "Lq": 32,
+      "Ld": 1030,
+      "d": 128,
+      "atomic": {
+        "median_ms": 6.0991,
+        "std_ms": 1.08,
+        "peak_gb": 4.0279
+      },
+      "sparse_dd": {
+        "median_ms": 6.3715,
+        "std_ms": 1.3602,
+        "peak_gb": 4.0279
+      },
+      "auto": {
+        "median_ms": 6.0959,
+        "std_ms": 0.9944,
+        "peak_gb": 4.0279
+      }
+    },
+    {
+      "name": "shared-smoke B64 Ld180",
+      "layout": "shared",
+      "Nq": 64,
+      "B": 64,
+      "Lq": 32,
+      "Ld": 180,
+      "d": 128,
+      "atomic": {
+        "median_ms": 2.2599,
+        "std_ms": 0.9426,
+        "peak_gb": 0.0125
+      },
+      "sparse_dd": {
+        "median_ms": 0.9771,
+        "std_ms": 0.5885,
+        "peak_gb": 0.0203
+      }
+    }
+  ]
+}

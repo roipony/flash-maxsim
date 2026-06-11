@@ -1,0 +1,70 @@
+{
+  "gpu": "NVIDIA H100 80GB HBM3",
+  "rows": [
+    {
+      "shape": "textual",
+      "Lq": 32,
+      "Ld": 300,
+      "B": 1000,
+      "flash_ms": 0.121,
+      "naive_fp16_ms": 0.121,
+      "naive_fp32_tf32_ms": 0.147,
+      "naive_fp32_true_ms": 0.179,
+      "spd_fp16": 0.99,
+      "spd_fp32_tf32": 1.21,
+      "spd_fp32_true": 1.48
+    },
+    {
+      "shape": "long-doc",
+      "Lq": 32,
+      "Ld": 1024,
+      "B": 1000,
+      "flash_ms": 0.182,
+      "naive_fp16_ms": 0.219,
+      "naive_fp32_tf32_ms": 0.327,
+      "naive_fp32_true_ms": 0.434,
+      "spd_fp16": 1.2,
+      "spd_fp32_tf32": 1.8,
+      "spd_fp32_true": 2.39
+    },
+    {
+      "shape": "medium",
+      "Lq": 128,
+      "Ld": 1024,
+      "B": 1000,
+      "flash_ms": 0.195,
+      "naive_fp16_ms": 0.41,
+      "naive_fp32_tf32_ms": 0.651,
+      "naive_fp32_true_ms": 1.182,
+      "spd_fp16": 2.1,
+      "spd_fp32_tf32": 3.34,
+      "spd_fp32_true": 6.06
+    },
+    {
+      "shape": "visual",
+      "Lq": 512,
+      "Ld": 1024,
+      "B": 1000,
+      "flash_ms": 0.439,
+      "naive_fp16_ms": 1.156,
+      "naive_fp32_tf32_ms": 1.85,
+      "naive_fp32_true_ms": 4.471,
+      "spd_fp16": 2.64,
+      "spd_fp32_tf32": 4.22,
+      "spd_fp32_true": 10.19
+    },
+    {
+      "shape": "ColPali",
+      "Lq": 1024,
+      "Ld": 1024,
+      "B": 1000,
+      "flash_ms": 0.77,
+      "naive_fp16_ms": 2.202,
+      "naive_fp32_tf32_ms": 3.616,
+      "naive_fp32_true_ms": 12.001,
+      "spd_fp16": 2.86,
+      "spd_fp32_tf32": 4.7,
+      "spd_fp32_true": 15.59
+    }
+  ]
+}

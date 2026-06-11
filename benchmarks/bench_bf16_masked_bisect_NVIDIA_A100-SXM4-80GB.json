@@ -1,0 +1,46 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "shape": {
+    "B": 4,
+    "Lq": 1024,
+    "Ld": 1024,
+    "d": 128
+  },
+  "results": [
+    {
+      "label": "fp16, unmasked  (d_lens=full)",
+      "max_abs": 0.002227783203125,
+      "mean_abs": 0.0011234283447265625
+    },
+    {
+      "label": "fp16,   masked",
+      "max_abs": 0.00213623046875,
+      "mean_abs": 0.00077056884765625
+    },
+    {
+      "label": "bf16, unmasked  (d_lens=full)",
+      "max_abs": 0.0137939453125,
+      "mean_abs": 0.00571441650390625
+    },
+    {
+      "label": "bf16,   masked  <-- raphaelsty's bug",
+      "max_abs": 0.011199951171875,
+      "mean_abs": 0.0048389434814453125
+    },
+    {
+      "label": "probe_A: bf16, D pre-masked outside flash, d_lens=full",
+      "max_abs": 0.011199951171875,
+      "mean_abs": 0.0048389434814453125
+    },
+    {
+      "label": "probe_B: caller-side .half() cast, then masked flash",
+      "max_abs": 0.011199951171875,
+      "mean_abs": 0.0048389434814453125
+    },
+    {
+      "label": "probe_C: caller-side .float() cast, then masked flash",
+      "max_abs": 0.011199951171875,
+      "mean_abs": 0.0048389434814453125
+    }
+  ]
+}

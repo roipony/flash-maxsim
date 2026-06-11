@@ -1,0 +1,101 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "results": [
+    {
+      "shape": "long-doc",
+      "Lq": 32,
+      "Ld": 1024,
+      "dtype": "fp16",
+      "mask_mode": "light",
+      "torch_max": 0.0024271011352539062,
+      "torch_mean": 0.0011197030544281006,
+      "flash_max": 0.00022983551025390625,
+      "flash_mean": 9.658932685852051e-05,
+      "flash_over_torch": 0.09469548133595285
+    },
+    {
+      "shape": "long-doc",
+      "Lq": 32,
+      "Ld": 1024,
+      "dtype": "fp16",
+      "mask_mode": "heavy",
+      "torch_max": 0.0018277168273925781,
+      "torch_mean": 0.0007527470588684082,
+      "flash_max": 0.000263214111328125,
+      "flash_mean": 0.00010102987289428711,
+      "flash_over_torch": 0.144012522828072
+    },
+    {
+      "shape": "long-doc",
+      "Lq": 32,
+      "Ld": 1024,
+      "dtype": "bf16",
+      "mask_mode": "light",
+      "torch_max": 0.018266677856445312,
+      "torch_mean": 0.010227888822555542,
+      "flash_max": 0.0020689964294433594,
+      "flash_mean": 0.0007621943950653076,
+      "flash_over_torch": 0.11326615850475097
+    },
+    {
+      "shape": "long-doc",
+      "Lq": 32,
+      "Ld": 1024,
+      "dtype": "bf16",
+      "mask_mode": "heavy",
+      "torch_max": 0.015564918518066406,
+      "torch_mean": 0.008655190467834473,
+      "flash_max": 0.002830028533935547,
+      "flash_mean": 0.0008834302425384521,
+      "flash_over_torch": 0.1818209668525213
+    },
+    {
+      "shape": "ColPali",
+      "Lq": 1024,
+      "Ld": 1024,
+      "dtype": "fp16",
+      "mask_mode": "light",
+      "torch_max": 0.0540313720703125,
+      "torch_mean": 0.019974708557128906,
+      "flash_max": 0.0016326904296875,
+      "flash_mean": 0.0007610321044921875,
+      "flash_over_torch": 0.030217452696978255
+    },
+    {
+      "shape": "ColPali",
+      "Lq": 1024,
+      "Ld": 1024,
+      "dtype": "fp16",
+      "mask_mode": "heavy",
+      "torch_max": 0.06005859375,
+      "torch_mean": 0.028191089630126953,
+      "flash_max": 0.001220703125,
+      "flash_mean": 0.0005779266357421875,
+      "flash_over_torch": 0.02032520325203252
+    },
+    {
+      "shape": "ColPali",
+      "Lq": 1024,
+      "Ld": 1024,
+      "dtype": "bf16",
+      "mask_mode": "light",
+      "torch_max": 0.763824462890625,
+      "torch_mean": 0.34739208221435547,
+      "flash_max": 0.0087738037109375,
+      "flash_mean": 0.0045318603515625,
+      "flash_over_torch": 0.011486675456470495
+    },
+    {
+      "shape": "ColPali",
+      "Lq": 1024,
+      "Ld": 1024,
+      "dtype": "bf16",
+      "mask_mode": "heavy",
+      "torch_max": 0.493682861328125,
+      "torch_mean": 0.26256895065307617,
+      "flash_max": 0.0140533447265625,
+      "flash_mean": 0.005368232727050781,
+      "flash_over_torch": 0.028466341101563947
+    }
+  ]
+}

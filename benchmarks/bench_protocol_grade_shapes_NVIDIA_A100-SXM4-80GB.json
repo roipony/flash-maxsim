@@ -1,0 +1,193 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "part": "shapes",
+  "torch": "2.8.0+cu128",
+  "protocol": "interleaved round-robin, 100MB L2 flush per call, CUDA-event median+IQR, compile warmup>=100 with subprocess autotune, per-method peak passes",
+  "rows": [
+    {
+      "shape": "textual",
+      "Lq": 32,
+      "Ld": 300,
+      "B": 1000,
+      "eager_fp16": {
+        "ms": 0.193,
+        "iqr": 0.0015
+      },
+      "eager_fp32_tf32": {
+        "ms": 0.242,
+        "iqr": 0.0034
+      },
+      "compile_ma_fp32": {
+        "ms": 0.47,
+        "iqr": 0.0082
+      },
+      "compile_nocg_fp16": {
+        "ms": 0.195,
+        "iqr": 0.0046
+      },
+      "flash": {
+        "ms": 0.2,
+        "iqr": 0.0073
+      },
+      "peaks_gb": {
+        "eager_fp16": 0.364,
+        "eager_fp32_tf32": 0.383,
+        "flash": 0.345
+      },
+      "spd": {
+        "eager_fp16": 0.96,
+        "eager_fp32_tf32": 1.21,
+        "compile_ma_fp32": 2.35,
+        "compile_nocg_fp16": 0.97
+      }
+    },
+    {
+      "shape": "long-doc",
+      "Lq": 32,
+      "Ld": 1024,
+      "B": 1000,
+      "eager_fp16": {
+        "ms": 0.381,
+        "iqr": 0.0388
+      },
+      "eager_fp32_tf32": {
+        "ms": 0.599,
+        "iqr": 0.0175
+      },
+      "compile_ma_fp32": {
+        "ms": 1.313,
+        "iqr": 0.0223
+      },
+      "compile_nocg_fp16": {
+        "ms": 0.37,
+        "iqr": 0.0303
+      },
+      "flash": {
+        "ms": 0.307,
+        "iqr": 0.0069
+      },
+      "peaks_gb": {
+        "eager_fp16": 0.966,
+        "eager_fp32_tf32": 1.032,
+        "flash": 0.9
+      },
+      "spd": {
+        "eager_fp16": 1.24,
+        "eager_fp32_tf32": 1.95,
+        "compile_ma_fp32": 4.28,
+        "compile_nocg_fp16": 1.21
+      }
+    },
+    {
+      "shape": "medium",
+      "Lq": 128,
+      "Ld": 1024,
+      "B": 1000,
+      "eager_fp16": {
+        "ms": 0.742,
+        "iqr": 0.0077
+      },
+      "eager_fp32_tf32": {
+        "ms": 1.071,
+        "iqr": 0.0048
+      },
+      "compile_ma_fp32": {
+        "ms": 1.775,
+        "iqr": 0.0091
+      },
+      "compile_nocg_fp16": {
+        "ms": 0.659,
+        "iqr": 0.0101
+      },
+      "flash": {
+        "ms": 0.38,
+        "iqr": 0.0086
+      },
+      "peaks_gb": {
+        "eager_fp16": 1.163,
+        "eager_fp32_tf32": 1.426,
+        "flash": 0.9
+      },
+      "spd": {
+        "eager_fp16": 1.95,
+        "eager_fp32_tf32": 2.82,
+        "compile_ma_fp32": 4.67,
+        "compile_nocg_fp16": 1.73
+      }
+    },
+    {
+      "shape": "visual",
+      "Lq": 512,
+      "Ld": 1024,
+      "B": 1000,
+      "eager_fp16": {
+        "ms": 2.178,
+        "iqr": 0.0168
+      },
+      "eager_fp32_tf32": {
+        "ms": 3.318,
+        "iqr": 0.017
+      },
+      "compile_ma_fp32": {
+        "ms": 3.85,
+        "iqr": 0.0208
+      },
+      "compile_nocg_fp16": {
+        "ms": 1.794,
+        "iqr": 0.0144
+      },
+      "flash": {
+        "ms": 0.98,
+        "iqr": 0.0101
+      },
+      "peaks_gb": {
+        "eager_fp16": 1.954,
+        "eager_fp32_tf32": 3.003,
+        "flash": 0.9
+      },
+      "spd": {
+        "eager_fp16": 2.22,
+        "eager_fp32_tf32": 3.39,
+        "compile_ma_fp32": 3.93,
+        "compile_nocg_fp16": 1.83
+      }
+    },
+    {
+      "shape": "ColPali",
+      "Lq": 1024,
+      "Ld": 1024,
+      "B": 1000,
+      "eager_fp16": {
+        "ms": 4.242,
+        "iqr": 0.0384
+      },
+      "eager_fp32_tf32": {
+        "ms": 6.633,
+        "iqr": 0.0499
+      },
+      "compile_ma_fp32": {
+        "ms": 6.816,
+        "iqr": 0.0408
+      },
+      "compile_nocg_fp16": {
+        "ms": 3.436,
+        "iqr": 0.027
+      },
+      "flash": {
+        "ms": 1.766,
+        "iqr": 0.0202
+      },
+      "peaks_gb": {
+        "eager_fp16": 3.008,
+        "eager_fp32_tf32": 5.124,
+        "flash": 0.901
+      },
+      "spd": {
+        "eager_fp16": 2.4,
+        "eager_fp32_tf32": 3.76,
+        "compile_ma_fp32": 3.86,
+        "compile_nocg_fp16": 1.95
+      }
+    }
+  ]
+}

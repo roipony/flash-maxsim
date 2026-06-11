@@ -1,0 +1,127 @@
+GPU: NVIDIA A100-SXM4-80GB
+
+
+========================================================================================================================
+  1. flash_maxsim(Q, D) — single query vs B docs
+========================================================================================================================
+Config                                           Vanilla   Compiled      Flash        Naive Speedup   Compiled Speedup
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  Lq=32, Ld=128, B=100                           0.1170ms    0.1416ms    0.1115ms     1.0x            1.3x
+  Lq=32, Ld=128, B=1000                          0.1386ms    0.2015ms    0.1535ms     0.9x            1.3x
+  Lq=32, Ld=300, B=1000                          0.2098ms    0.3357ms    0.1848ms     1.1x            1.8x
+  Lq=128, Ld=512, B=100                          0.1354ms    0.1893ms    0.1332ms     1.0x            1.4x
+  Lq=128, Ld=512, B=1000                         0.4301ms    0.6077ms    0.2619ms     1.6x            2.3x
+  Lq=512, Ld=1024, B=100                         0.3091ms    0.3478ms    0.2609ms     1.2x            1.3x
+  Lq=1024, Ld=1024, B=100                        0.5091ms    0.5249ms    0.3384ms     1.5x            1.6x
+  Lq=1024, Ld=1024, B=1000                       4.3166ms    4.2190ms    2.1179ms     2.0x            2.0x
+
+========================================================================================================================
+  2. flash_maxsim_batched(shared_docs=True) — Nq queries vs shared B docs
+========================================================================================================================
+Config                                           Vanilla   Compiled      Flash        Naive Speedup   Compiled Speedup
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  Nq=10, Lq=32, Ld=300, B=100                    0.8895ms    0.3162ms    0.2477ms     3.6x            1.3x
+  Nq=50, Lq=32, Ld=300, B=100                    3.9800ms    1.0053ms    0.5214ms     7.6x            1.9x
+  Nq=10, Lq=32, Ld=300, B=1000                   1.3562ms    1.3097ms    0.9494ms     1.4x            1.4x
+
+========================================================================================================================
+  3. flash_maxsim_batched(shared_docs=False) — N independent pairs
+========================================================================================================================
+Config                                           Vanilla   Compiled      Flash        Naive Speedup   Compiled Speedup
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  N=1, Lq=32, Ld=64                              0.2491ms    0.1489ms    0.2082ms     1.2x            0.7x
+  N=5, Lq=32, Ld=64                              0.4979ms    0.1590ms    0.1987ms     2.5x            0.8x
+  N=16, Lq=32, Ld=64                             1.1350ms    0.1829ms    0.2043ms     5.6x            0.9x
+  N=1, Lq=64, Ld=128                             0.2513ms    0.1556ms    0.2087ms     1.2x            0.7x
+  N=5, Lq=64, Ld=128                             0.5147ms    0.1800ms    0.2004ms     2.6x            0.9x
+  N=16, Lq=64, Ld=128                            1.1589ms    0.2865ms    0.2054ms     5.6x            1.4x
+  N=1, Lq=128, Ld=256                            0.2499ms    0.1526ms    0.1661ms     1.5x            0.9x
+  N=5, Lq=128, Ld=256                            0.5013ms    0.1769ms    0.1555ms     3.2x            1.1x
+  N=16, Lq=128, Ld=256                           1.1369ms    0.2889ms    0.1616ms     7.0x            1.8x
+  N=1, Lq=249, Ld=252                            0.2532ms    0.1552ms    0.2127ms     1.2x            0.7x
+  N=5, Lq=249, Ld=252                            0.5083ms    0.1812ms    0.2060ms     2.5x            0.9x
+  N=16, Lq=249, Ld=252                           1.1775ms    0.3062ms    0.2113ms     5.6x            1.4x
+  N=32, Lq=249, Ld=252                           2.1226ms    0.4800ms    0.2197ms     9.7x            2.2x
+  N=64, Lq=249, Ld=252                           3.9540ms    1.0578ms    0.2385ms    16.6x            4.4x
+
+========================================================================================================================
+  4. flash_maxsim_pairs — varlen path (e2e including packing)
+========================================================================================================================
+Config                                           Vanilla   Compiled      Flash        Naive Speedup   Compiled Speedup
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+  N=50, Lq=32, Ld=300 (varlen)                   3.1453ms    3.1745ms    0.3391ms     9.3x            9.4x
+  N=100, Lq=32, Ld=300 (varlen)                  6.1189ms    6.1547ms    0.3911ms    15.6x           15.7x
+  N=500, Lq=32, Ld=300 (varlen)                 29.7985ms   29.8098ms    0.8918ms    33.4x           33.4x
+  N=100, Lq=128, Ld=512 (varlen)                 6.0568ms    6.0894ms    0.3917ms    15.5x           15.5x
+  N=100, Lq=32, Ld=1024 (varlen)                 6.0442ms    6.0775ms    0.3910ms    15.5x           15.5x
+
+========================================================================================================================
+  5. Full compute_maxsim_scores replacement (vLLM patch)
+========================================================================================================================
+Config                                           Vanilla   Compiled      Flash        Naive Speedup   Compiled Speedup
+────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+
+  [All different queries — serving pattern]
+  N=1, Lq=63, Ld=66 (diff queries)               0.2527ms       N/A      0.2104ms     1.2x             N/A
+  N=5, Lq=63, Ld=66 (diff queries)               0.4908ms       N/A      0.2042ms     2.4x             N/A
+  N=16, Lq=63, Ld=66 (diff queries)              1.1480ms       N/A      0.2286ms     5.0x             N/A
+  N=32, Lq=63, Ld=66 (diff queries)              2.0734ms       N/A      0.2631ms     7.9x             N/A
+  N=1, Lq=249, Ld=252 (diff queries)             0.2467ms       N/A      0.2095ms     1.2x             N/A
+  N=5, Lq=249, Ld=252 (diff queries)             0.4967ms       N/A      0.2049ms     2.4x             N/A
+  N=16, Lq=249, Ld=252 (diff queries)            1.1628ms       N/A      0.2268ms     5.1x             N/A
+  N=32, Lq=249, Ld=252 (diff queries)            2.0703ms       N/A      0.2607ms     7.9x             N/A
+
+  [Shared query — reranking pattern]
+  B=10, Lq=32, Ld=128 (shared query)             0.7946ms       N/A      0.1604ms     5.0x             N/A
+  B=100, Lq=32, Ld=128 (shared query)            6.0362ms       N/A      0.3429ms    17.6x             N/A
+  B=1000, Lq=32, Ld=128 (shared query)          59.1701ms       N/A      2.2809ms    25.9x             N/A
+  B=10, Lq=249, Ld=252 (shared query)            0.7908ms       N/A      0.2486ms     3.2x             N/A
+  B=100, Lq=249, Ld=252 (shared query)           6.1289ms       N/A      0.4246ms    14.4x             N/A
+  B=1000, Lq=249, Ld=252 (shared query)         60.3670ms       N/A      2.3441ms    25.8x             N/A
+
+========================================================================================================================
+  DONE
+========================================================================================================================
+
+------------------------------------------------------------
+Sender: batch System <batchadmin@host>
+Subject: Job 1844153: <bash -c "cd /path/to/repo && PYTHONPATH=/path/to/repo /path/to/env bench_all_functions.py"> in cluster <CCCFP15Cluster> Done
+
+Job <bash -c "cd /path/to/repo && PYTHONPATH=/path/to/repo /path/to/env bench_all_functions.py"> was submitted from host <host-login5> by user <user> in cluster <CCCFP15Cluster> at Thu Jun 11 05:19:18 2026
+Job was executed on host(s) <host>, in queue <normal>, as user <user> in cluster <CCCFP15Cluster> at Thu Jun 11 05:18:42 2026
+</u/user> was used as the home directory.
+</path/to/repo was used as the working directory.
+Started at Thu Jun 11 05:18:42 2026
+Terminated at Thu Jun 11 05:26:35 2026
+Results reported at Thu Jun 11 05:26:35 2026
+
+Your job looked like:
+
+------------------------------------------------------------
+# batch: User input
+bash -c "cd /path/to/repo && PYTHONPATH=/path/to/repo /path/to/env bench_all_functions.py"
+------------------------------------------------------------
+
+Successfully completed.
+
+Resource usage summary:
+
+    CPU time :                                   646.00 sec.
+    Max Memory :                                 6 GB
+    Average Memory :                             4.90 GB
+    Total Requested Memory :                     200.00 GB
+    Delta Memory :                               194.00 GB
+    Max Swap :                                   -
+    Max Processes :                              38
+    Max Threads :                                253
+    Run time :                                   473 sec.
+    Turnaround time :                            437 sec.
+
+The output (if any) is above this job summary.
+
+
+
+PS:
+
+Read file </path/to/env for stderr output of this job.
+

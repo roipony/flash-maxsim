@@ -1,0 +1,49 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "Lq": 1024,
+  "Ld": 1024,
+  "d": 128,
+  "rows": [
+    {
+      "B": 64,
+      "naive": {
+        "ms": 81.4,
+        "peak_gb": 51.657,
+        "ok": true
+      },
+      "recompute_best": {
+        "ms": 105.85,
+        "peak_gb": 17.314,
+        "ok": true,
+        "chunk": 32
+      },
+      "flash": {
+        "ms": 13.11,
+        "peak_gb": 0.336,
+        "ok": true
+      },
+      "flash_vs_recompute": 8.07,
+      "mem_ratio": 51.5
+    },
+    {
+      "B": 128,
+      "naive": {
+        "ok": false,
+        "error": "CUDA out of memory. Tried to allocate 64.00 GiB. GPU 0 has a total capacity of 79.25 GiB of which 14"
+      },
+      "recompute_best": {
+        "ms": 425.11,
+        "peak_gb": 17.407,
+        "ok": true,
+        "chunk": 16
+      },
+      "flash": {
+        "ms": 53.7,
+        "peak_gb": 0.286,
+        "ok": true
+      },
+      "flash_vs_recompute": 7.92,
+      "mem_ratio": 60.9
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "Lq": 1024,
+  "Ld": 1024,
+  "d": 128,
+  "B": 1000,
+  "flash_fp16": {
+    "max_abs_err": 0.0001220703125,
+    "max_rel_err": 4.250947824857576e-07,
+    "mean_rel_err": 2.629634821005311e-07,
+    "top20_overlap": 1.0,
+    "top50_overlap": 1.0,
+    "spearman_rho": 0.9999998807907104
+  },
+  "flash_int8": {
+    "max_abs_err": 0.093841552734375,
+    "max_rel_err": 0.00032469589496031404,
+    "mean_rel_err": 7.723652379354462e-05,
+    "top20_overlap": 1.0,
+    "top50_overlap": 0.96,
+    "spearman_rho": 0.999591588973999
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "torch": "2.8.0+cu128",
+  "mode": "max-autotune-no-cudagraphs",
+  "rows": [
+    {
+      "label": "textual",
+      "Lq": 32,
+      "Ld": 300,
+      "B": 1000,
+      "ms": 0.185,
+      "peak_gb": 0.225,
+      "ok": true
+    },
+    {
+      "label": "long-doc",
+      "Lq": 32,
+      "Ld": 1024,
+      "B": 1000,
+      "ms": 0.317,
+      "peak_gb": 0.64,
+      "ok": true
+    },
+    {
+      "label": "medium",
+      "Lq": 128,
+      "Ld": 1024,
+      "B": 1000,
+      "ms": 0.574,
+      "peak_gb": 0.837,
+      "ok": true
+    },
+    {
+      "label": "visual",
+      "Lq": 512,
+      "Ld": 1024,
+      "B": 1000,
+      "ms": 1.936,
+      "peak_gb": 1.624,
+      "ok": true
+    },
+    {
+      "label": "ColPali",
+      "Lq": 1024,
+      "Ld": 1024,
+      "B": 1000,
+      "ms": 3.676,
+      "peak_gb": 2.672,
+      "ok": true
+    },
+    {
+      "label": "ColPali",
+      "Lq": 1024,
+      "Ld": 1024,
+      "B": 10000,
+      "ms": 34.749,
+      "peak_gb": 23.665,
+      "ok": true
+    },
+    {
+      "label": "ColPali",
+      "Lq": 1024,
+      "Ld": 1024,
+      "B": 20000,
+      "ms": 69.85,
+      "peak_gb": 47.279,
+      "ok": true
+    }
+  ]
+}

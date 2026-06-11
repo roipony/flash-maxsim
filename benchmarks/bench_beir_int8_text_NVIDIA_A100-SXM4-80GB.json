@@ -1,0 +1,80 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "encoder": "lightonai_colbertv2",
+  "results": [
+    {
+      "dataset": "arguana",
+      "n_eval": 1406,
+      "corpus": 8674,
+      "per_K": {
+        "5": {
+          "ndcg_baseline": 0.2844,
+          "recall_baseline": 0.5277,
+          "ndcg_flash": 0.2844,
+          "recall_flash": 0.5277,
+          "ndcg_int8": 0.2843,
+          "recall_int8": 0.5277,
+          "topk_overlap_flash_pct": 100.0,
+          "topk_overlap_int8_pct": 99.79
+        },
+        "10": {
+          "ndcg_baseline": 0.3308,
+          "recall_baseline": 0.6707,
+          "ndcg_flash": 0.3308,
+          "recall_flash": 0.6707,
+          "ndcg_int8": 0.331,
+          "recall_int8": 0.6714,
+          "topk_overlap_flash_pct": 100.0,
+          "topk_overlap_int8_pct": 99.69
+        },
+        "20": {
+          "ndcg_baseline": 0.3617,
+          "recall_baseline": 0.7902,
+          "ndcg_flash": 0.3617,
+          "recall_flash": 0.7902,
+          "ndcg_int8": 0.3613,
+          "recall_int8": 0.7888,
+          "topk_overlap_flash_pct": 100.0,
+          "topk_overlap_int8_pct": 99.76
+        }
+      }
+    },
+    {
+      "dataset": "scidocs",
+      "n_eval": 1000,
+      "corpus": 25657,
+      "per_K": {
+        "5": {
+          "ndcg_baseline": 0.1341,
+          "recall_baseline": 0.1217,
+          "ndcg_flash": 0.1341,
+          "recall_flash": 0.1217,
+          "ndcg_int8": 0.1339,
+          "recall_int8": 0.1213,
+          "topk_overlap_flash_pct": 100.0,
+          "topk_overlap_int8_pct": 99.74
+        },
+        "10": {
+          "ndcg_baseline": 0.1565,
+          "recall_baseline": 0.163,
+          "ndcg_flash": 0.1565,
+          "recall_flash": 0.163,
+          "ndcg_int8": 0.1564,
+          "recall_int8": 0.1628,
+          "topk_overlap_flash_pct": 100.0,
+          "topk_overlap_int8_pct": 99.72
+        },
+        "20": {
+          "ndcg_baseline": 0.1789,
+          "recall_baseline": 0.2152,
+          "ndcg_flash": 0.1789,
+          "recall_flash": 0.2152,
+          "ndcg_int8": 0.179,
+          "recall_int8": 0.2156,
+          "topk_overlap_flash_pct": 100.0,
+          "topk_overlap_int8_pct": 99.65
+        }
+      }
+    }
+  ]
+}

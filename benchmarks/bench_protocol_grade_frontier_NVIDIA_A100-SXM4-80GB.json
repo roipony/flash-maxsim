@@ -1,0 +1,176 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "part": "frontier",
+  "torch": "2.8.0+cu128",
+  "protocol": "interleaved round-robin, 100MB L2 flush per call, CUDA-event median+IQR, compile warmup>=100 with subprocess autotune, per-method peak passes",
+  "rows": [
+    {
+      "shape": "visual",
+      "Lq": 512,
+      "Ld": 1024,
+      "B": 5000,
+      "chunk": 1024,
+      "vanilla_fp16": {
+        "ms": 11.383,
+        "iqr": 0.1094
+      },
+      "chunked_fp16": {
+        "ms": 10.856,
+        "iqr": 0.1137
+      },
+      "flash": {
+        "ms": 4.24,
+        "iqr": 0.056
+      },
+      "peaks_gb": {
+        "vanilla_fp16": 6.734,
+        "chunked_fp16": 3.572,
+        "flash": 1.424
+      },
+      "spd": {
+        "vanilla_fp16": 2.68,
+        "chunked_fp16": 2.56
+      }
+    },
+    {
+      "shape": "visual",
+      "Lq": 512,
+      "Ld": 1024,
+      "B": 10000,
+      "chunk": 1024,
+      "vanilla_fp16": {
+        "ms": 22.815,
+        "iqr": 0.1236
+      },
+      "chunked_fp16": {
+        "ms": 21.724,
+        "iqr": 0.296
+      },
+      "flash": {
+        "ms": 8.319,
+        "iqr": 0.0905
+      },
+      "peaks_gb": {
+        "vanilla_fp16": 13.354,
+        "chunked_fp16": 4.882,
+        "flash": 2.735
+      },
+      "spd": {
+        "vanilla_fp16": 2.74,
+        "chunked_fp16": 2.61
+      }
+    },
+    {
+      "shape": "visual",
+      "Lq": 512,
+      "Ld": 1024,
+      "B": 20000,
+      "chunk": 1024,
+      "vanilla_fp16": {
+        "ms": 46.496,
+        "iqr": 0.208
+      },
+      "chunked_fp16": {
+        "ms": 43.377,
+        "iqr": 0.195
+      },
+      "flash": {
+        "ms": 16.449,
+        "iqr": 0.1169
+      },
+      "peaks_gb": {
+        "vanilla_fp16": 26.594,
+        "chunked_fp16": 7.504,
+        "flash": 5.357
+      },
+      "spd": {
+        "vanilla_fp16": 2.83,
+        "chunked_fp16": 2.64
+      }
+    },
+    {
+      "shape": "ColPali",
+      "Lq": 1024,
+      "Ld": 1024,
+      "B": 5000,
+      "chunk": 1024,
+      "vanilla_fp16": {
+        "ms": 22.665,
+        "iqr": 0.1226
+      },
+      "chunked_fp16": {
+        "ms": 21.425,
+        "iqr": 0.2458
+      },
+      "flash": {
+        "ms": 8.213,
+        "iqr": 0.0853
+      },
+      "peaks_gb": {
+        "vanilla_fp16": 12.043,
+        "chunked_fp16": 5.719,
+        "flash": 1.425
+      },
+      "spd": {
+        "vanilla_fp16": 2.76,
+        "chunked_fp16": 2.61
+      }
+    },
+    {
+      "shape": "ColPali",
+      "Lq": 1024,
+      "Ld": 1024,
+      "B": 10000,
+      "chunk": 1024,
+      "vanilla_fp16": {
+        "ms": 45.737,
+        "iqr": 0.3312
+      },
+      "chunked_fp16": {
+        "ms": 42.779,
+        "iqr": 0.1984
+      },
+      "flash": {
+        "ms": 16.221,
+        "iqr": 0.0677
+      },
+      "peaks_gb": {
+        "vanilla_fp16": 23.973,
+        "chunked_fp16": 7.03,
+        "flash": 2.735
+      },
+      "spd": {
+        "vanilla_fp16": 2.82,
+        "chunked_fp16": 2.64
+      }
+    },
+    {
+      "shape": "ColPali",
+      "Lq": 1024,
+      "Ld": 1024,
+      "B": 20000,
+      "chunk": 1024,
+      "vanilla_fp16": {
+        "ms": 92.956,
+        "iqr": 0.4128
+      },
+      "chunked_fp16": {
+        "ms": 84.624,
+        "iqr": 0.3633
+      },
+      "flash": {
+        "ms": 32.651,
+        "iqr": 0.2128
+      },
+      "peaks_gb": {
+        "vanilla_fp16": 47.832,
+        "chunked_fp16": 9.652,
+        "flash": 5.357
+      },
+      "spd": {
+        "vanilla_fp16": 2.85,
+        "chunked_fp16": 2.59
+      }
+    }
+  ]
+}

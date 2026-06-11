@@ -1,0 +1,672 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "gpu_mem_gb": 85.1,
+  "configs": [
+    {
+      "label": "Textual (Lq=32, Ld=300, B=1K)",
+      "B": 1000,
+      "Lq": 32,
+      "Ld": 300,
+      "d": 128,
+      "sim_per_doc_mb": 0.04,
+      "flash_ms": 0.164,
+      "chunks": [
+        {
+          "chunk_size": 1,
+          "sim_mb": 0.0,
+          "eager_ms": 118.751,
+          "compiled_ms": 118.751,
+          "eager_vs_flash": 722.77,
+          "compiled_vs_flash": 278.39,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 2,
+          "sim_mb": 0.1,
+          "eager_ms": 61.218,
+          "compiled_ms": 61.218,
+          "eager_vs_flash": 372.6,
+          "compiled_vs_flash": 148.53,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 5,
+          "sim_mb": 0.2,
+          "eager_ms": 24.688,
+          "compiled_ms": 24.688,
+          "eager_vs_flash": 150.26,
+          "compiled_vs_flash": 64.59,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 10,
+          "sim_mb": 0.4,
+          "eager_ms": 12.412,
+          "compiled_ms": 12.412,
+          "eager_vs_flash": 75.55,
+          "compiled_vs_flash": 32.87,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 20,
+          "sim_mb": 0.8,
+          "eager_ms": 6.237,
+          "compiled_ms": 6.237,
+          "eager_vs_flash": 37.96,
+          "compiled_vs_flash": 17.04,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 50,
+          "sim_mb": 1.9,
+          "eager_ms": 2.507,
+          "compiled_ms": 2.507,
+          "eager_vs_flash": 15.26,
+          "compiled_vs_flash": 7.51,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 100,
+          "sim_mb": 3.8,
+          "eager_ms": 1.308,
+          "compiled_ms": 1.308,
+          "eager_vs_flash": 7.96,
+          "compiled_vs_flash": 4.36,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 200,
+          "sim_mb": 7.7,
+          "eager_ms": 0.68,
+          "compiled_ms": 0.68,
+          "eager_vs_flash": 4.14,
+          "compiled_vs_flash": 2.77,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 500,
+          "sim_mb": 19.2,
+          "eager_ms": 0.472,
+          "compiled_ms": 0.472,
+          "eager_vs_flash": 2.87,
+          "compiled_vs_flash": 3.1,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 1000,
+          "sim_mb": 38.4,
+          "eager_ms": 0.434,
+          "compiled_ms": 0.434,
+          "eager_vs_flash": 2.64,
+          "compiled_vs_flash": 2.88,
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "label": "Textual (Lq=32, Ld=300, B=5K)",
+      "B": 5000,
+      "Lq": 32,
+      "Ld": 300,
+      "d": 128,
+      "sim_per_doc_mb": 0.04,
+      "flash_ms": 0.337,
+      "chunks": [
+        {
+          "chunk_size": 1,
+          "sim_mb": 0.0,
+          "eager_ms": 592.507,
+          "compiled_ms": 592.507,
+          "eager_vs_flash": 1758.65,
+          "compiled_vs_flash": 1772.8,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 2,
+          "sim_mb": 0.1,
+          "eager_ms": 306.455,
+          "compiled_ms": 306.455,
+          "eager_vs_flash": 909.6,
+          "compiled_vs_flash": 917.51,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 5,
+          "sim_mb": 0.2,
+          "eager_ms": 122.306,
+          "compiled_ms": 122.306,
+          "eager_vs_flash": 363.02,
+          "compiled_vs_flash": 366.2,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 10,
+          "sim_mb": 0.4,
+          "eager_ms": 61.618,
+          "compiled_ms": 61.618,
+          "eager_vs_flash": 182.89,
+          "compiled_vs_flash": 183.61,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 20,
+          "sim_mb": 0.8,
+          "eager_ms": 30.884,
+          "compiled_ms": 30.884,
+          "eager_vs_flash": 91.67,
+          "compiled_vs_flash": 92.34,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 50,
+          "sim_mb": 1.9,
+          "eager_ms": 12.245,
+          "compiled_ms": 12.245,
+          "eager_vs_flash": 36.35,
+          "compiled_vs_flash": 36.77,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 100,
+          "sim_mb": 3.8,
+          "eager_ms": 6.263,
+          "compiled_ms": 6.263,
+          "eager_vs_flash": 18.59,
+          "compiled_vs_flash": 18.84,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 200,
+          "sim_mb": 7.7,
+          "eager_ms": 3.103,
+          "compiled_ms": 3.103,
+          "eager_vs_flash": 9.21,
+          "compiled_vs_flash": 9.4,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 500,
+          "sim_mb": 19.2,
+          "eager_ms": 2.203,
+          "compiled_ms": 2.203,
+          "eager_vs_flash": 6.54,
+          "compiled_vs_flash": 6.63,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 1000,
+          "sim_mb": 38.4,
+          "eager_ms": 2.002,
+          "compiled_ms": 2.002,
+          "eager_vs_flash": 5.94,
+          "compiled_vs_flash": 6.03,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 2000,
+          "sim_mb": 76.8,
+          "eager_ms": 1.912,
+          "compiled_ms": 1.912,
+          "eager_vs_flash": 5.68,
+          "compiled_vs_flash": 5.77,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 5000,
+          "sim_mb": 192.0,
+          "eager_ms": 1.838,
+          "compiled_ms": 1.838,
+          "eager_vs_flash": 5.46,
+          "compiled_vs_flash": 5.56,
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "label": "Medium (Lq=128, Ld=1024, B=1K)",
+      "B": 1000,
+      "Lq": 128,
+      "Ld": 1024,
+      "d": 128,
+      "sim_per_doc_mb": 0.52,
+      "flash_ms": 0.338,
+      "chunks": [
+        {
+          "chunk_size": 1,
+          "sim_mb": 0.5,
+          "eager_ms": 122.756,
+          "compiled_ms": 122.756,
+          "eager_vs_flash": 363.03,
+          "compiled_vs_flash": 364.4,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 2,
+          "sim_mb": 1.0,
+          "eager_ms": 61.625,
+          "compiled_ms": 61.625,
+          "eager_vs_flash": 182.24,
+          "compiled_vs_flash": 183.96,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 5,
+          "sim_mb": 2.6,
+          "eager_ms": 24.679,
+          "compiled_ms": 24.679,
+          "eager_vs_flash": 72.98,
+          "compiled_vs_flash": 73.69,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 10,
+          "sim_mb": 5.2,
+          "eager_ms": 12.34,
+          "compiled_ms": 12.34,
+          "eager_vs_flash": 36.49,
+          "compiled_vs_flash": 36.92,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 20,
+          "sim_mb": 10.5,
+          "eager_ms": 6.211,
+          "compiled_ms": 6.211,
+          "eager_vs_flash": 18.37,
+          "compiled_vs_flash": 18.66,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 50,
+          "sim_mb": 26.2,
+          "eager_ms": 2.483,
+          "compiled_ms": 2.483,
+          "eager_vs_flash": 7.34,
+          "compiled_vs_flash": 7.56,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 100,
+          "sim_mb": 52.4,
+          "eager_ms": 2.145,
+          "compiled_ms": 2.145,
+          "eager_vs_flash": 6.34,
+          "compiled_vs_flash": 6.43,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 200,
+          "sim_mb": 104.9,
+          "eager_ms": 1.917,
+          "compiled_ms": 1.917,
+          "eager_vs_flash": 5.67,
+          "compiled_vs_flash": 5.76,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 500,
+          "sim_mb": 262.1,
+          "eager_ms": 1.777,
+          "compiled_ms": 1.777,
+          "eager_vs_flash": 5.25,
+          "compiled_vs_flash": 5.34,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 1000,
+          "sim_mb": 524.3,
+          "eager_ms": 1.728,
+          "compiled_ms": 1.728,
+          "eager_vs_flash": 5.11,
+          "compiled_vs_flash": 5.2,
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "label": "Visual (Lq=1024, Ld=1024, B=1K)",
+      "B": 1000,
+      "Lq": 1024,
+      "Ld": 1024,
+      "d": 128,
+      "sim_per_doc_mb": 4.19,
+      "flash_ms": 1.666,
+      "chunks": [
+        {
+          "chunk_size": 1,
+          "sim_mb": 4.2,
+          "eager_ms": 122.576,
+          "compiled_ms": 122.576,
+          "eager_vs_flash": 73.57,
+          "compiled_vs_flash": 74.21,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 2,
+          "sim_mb": 8.4,
+          "eager_ms": 61.252,
+          "compiled_ms": 61.252,
+          "eager_vs_flash": 36.76,
+          "compiled_vs_flash": 37.08,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 5,
+          "sim_mb": 21.0,
+          "eager_ms": 24.589,
+          "compiled_ms": 24.589,
+          "eager_vs_flash": 14.76,
+          "compiled_vs_flash": 14.86,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 10,
+          "sim_mb": 41.9,
+          "eager_ms": 12.272,
+          "compiled_ms": 12.272,
+          "eager_vs_flash": 7.37,
+          "compiled_vs_flash": 7.42,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 20,
+          "sim_mb": 83.9,
+          "eager_ms": 10.032,
+          "compiled_ms": 10.032,
+          "eager_vs_flash": 6.02,
+          "compiled_vs_flash": 6.04,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 50,
+          "sim_mb": 209.7,
+          "eager_ms": 8.176,
+          "compiled_ms": 8.176,
+          "eager_vs_flash": 4.91,
+          "compiled_vs_flash": 4.93,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 100,
+          "sim_mb": 419.4,
+          "eager_ms": 7.609,
+          "compiled_ms": 7.609,
+          "eager_vs_flash": 4.57,
+          "compiled_vs_flash": 4.59,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 200,
+          "sim_mb": 838.9,
+          "eager_ms": 7.359,
+          "compiled_ms": 7.359,
+          "eager_vs_flash": 4.42,
+          "compiled_vs_flash": 4.44,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 500,
+          "sim_mb": 2097.2,
+          "eager_ms": 7.189,
+          "compiled_ms": 7.189,
+          "eager_vs_flash": 4.31,
+          "compiled_vs_flash": 4.34,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 1000,
+          "sim_mb": 4194.3,
+          "eager_ms": 7.298,
+          "compiled_ms": 7.298,
+          "eager_vs_flash": 4.38,
+          "compiled_vs_flash": 4.4,
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "label": "Visual (Lq=1024, Ld=1024, B=5K)",
+      "B": 5000,
+      "Lq": 1024,
+      "Ld": 1024,
+      "d": 128,
+      "sim_per_doc_mb": 4.19,
+      "flash_ms": 8.088,
+      "chunks": [
+        {
+          "chunk_size": 1,
+          "sim_mb": 4.2,
+          "eager_ms": 613.008,
+          "compiled_ms": 613.008,
+          "eager_vs_flash": 75.79,
+          "compiled_vs_flash": 76.38,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 2,
+          "sim_mb": 8.4,
+          "eager_ms": 306.321,
+          "compiled_ms": 306.321,
+          "eager_vs_flash": 37.87,
+          "compiled_vs_flash": 38.15,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 5,
+          "sim_mb": 21.0,
+          "eager_ms": 123.015,
+          "compiled_ms": 123.015,
+          "eager_vs_flash": 15.21,
+          "compiled_vs_flash": 15.32,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 10,
+          "sim_mb": 41.9,
+          "eager_ms": 61.019,
+          "compiled_ms": 61.019,
+          "eager_vs_flash": 7.54,
+          "compiled_vs_flash": 7.62,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 20,
+          "sim_mb": 83.9,
+          "eager_ms": 49.968,
+          "compiled_ms": 49.968,
+          "eager_vs_flash": 6.18,
+          "compiled_vs_flash": 6.18,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 50,
+          "sim_mb": 209.7,
+          "eager_ms": 40.879,
+          "compiled_ms": 40.879,
+          "eager_vs_flash": 5.05,
+          "compiled_vs_flash": 5.06,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 100,
+          "sim_mb": 419.4,
+          "eager_ms": 38.421,
+          "compiled_ms": 38.421,
+          "eager_vs_flash": 4.75,
+          "compiled_vs_flash": 4.75,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 200,
+          "sim_mb": 838.9,
+          "eager_ms": 37.294,
+          "compiled_ms": 37.294,
+          "eager_vs_flash": 4.61,
+          "compiled_vs_flash": 4.62,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 500,
+          "sim_mb": 2097.2,
+          "eager_ms": 36.23,
+          "compiled_ms": 36.23,
+          "eager_vs_flash": 4.48,
+          "compiled_vs_flash": 4.49,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 1000,
+          "sim_mb": 4194.3,
+          "eager_ms": 36.913,
+          "compiled_ms": 36.913,
+          "eager_vs_flash": 4.56,
+          "compiled_vs_flash": 4.57,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 2000,
+          "sim_mb": 8388.6,
+          "eager_ms": 38.195,
+          "compiled_ms": 38.195,
+          "eager_vs_flash": 4.72,
+          "compiled_vs_flash": 4.73,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 5000,
+          "sim_mb": 20971.5,
+          "eager_ms": 36.849,
+          "compiled_ms": 36.849,
+          "eager_vs_flash": 4.56,
+          "compiled_vs_flash": 4.56,
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "label": "Visual (Lq=1024, Ld=1024, B=10K)",
+      "B": 10000,
+      "Lq": 1024,
+      "Ld": 1024,
+      "d": 128,
+      "sim_per_doc_mb": 4.19,
+      "flash_ms": 16.206,
+      "chunks": [
+        {
+          "chunk_size": 1,
+          "sim_mb": 4.2,
+          "eager_ms": 1233.413,
+          "compiled_ms": 1233.413,
+          "eager_vs_flash": 76.11,
+          "compiled_vs_flash": 76.41,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 2,
+          "sim_mb": 8.4,
+          "eager_ms": 613.398,
+          "compiled_ms": 613.398,
+          "eager_vs_flash": 37.85,
+          "compiled_vs_flash": 38.16,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 5,
+          "sim_mb": 21.0,
+          "eager_ms": 246.052,
+          "compiled_ms": 246.052,
+          "eager_vs_flash": 15.18,
+          "compiled_vs_flash": 15.3,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 10,
+          "sim_mb": 41.9,
+          "eager_ms": 122.109,
+          "compiled_ms": 122.109,
+          "eager_vs_flash": 7.53,
+          "compiled_vs_flash": 7.6,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 20,
+          "sim_mb": 83.9,
+          "eager_ms": 99.826,
+          "compiled_ms": 99.826,
+          "eager_vs_flash": 6.16,
+          "compiled_vs_flash": 6.16,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 50,
+          "sim_mb": 209.7,
+          "eager_ms": 81.942,
+          "compiled_ms": 81.942,
+          "eager_vs_flash": 5.06,
+          "compiled_vs_flash": 5.06,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 100,
+          "sim_mb": 419.4,
+          "eager_ms": 76.855,
+          "compiled_ms": 76.855,
+          "eager_vs_flash": 4.74,
+          "compiled_vs_flash": 4.75,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 200,
+          "sim_mb": 838.9,
+          "eager_ms": 74.367,
+          "compiled_ms": 74.367,
+          "eager_vs_flash": 4.59,
+          "compiled_vs_flash": 4.59,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 500,
+          "sim_mb": 2097.2,
+          "eager_ms": 72.443,
+          "compiled_ms": 72.443,
+          "eager_vs_flash": 4.47,
+          "compiled_vs_flash": 4.47,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 1000,
+          "sim_mb": 4194.3,
+          "eager_ms": 73.852,
+          "compiled_ms": 73.852,
+          "eager_vs_flash": 4.56,
+          "compiled_vs_flash": 4.56,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 2000,
+          "sim_mb": 8388.6,
+          "eager_ms": 76.878,
+          "compiled_ms": 76.878,
+          "eager_vs_flash": 4.74,
+          "compiled_vs_flash": 4.75,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 5000,
+          "sim_mb": 20971.5,
+          "eager_ms": 73.858,
+          "compiled_ms": 73.858,
+          "eager_vs_flash": 4.56,
+          "compiled_vs_flash": 4.56,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 10000,
+          "sim_mb": 41943.0,
+          "latency_ms": null,
+          "status": "OOM"
+        }
+      ]
+    }
+  ]
+}

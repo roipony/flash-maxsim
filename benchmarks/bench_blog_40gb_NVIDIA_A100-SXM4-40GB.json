@@ -1,0 +1,360 @@
+{
+  "gpu": "NVIDIA A100-SXM4-40GB",
+  "vram_gb": 42.4,
+  "Lq": 1024,
+  "Ld": 1024,
+  "d": 128,
+  "torch": "2.8.0+cu128",
+  "protocol": "Each (B, method) runs in an isolated allocator state with inputs generated in the method's native dtype. Peak memory includes resident inputs + per-call intermediates / workspace under the user allocator (not a naked workspace number); cudagraph private pool excluded (no cudagraphs). OOM caught and recorded; non-OOM RuntimeErrors propagate.",
+  "rows": [
+    {
+      "B": 1000,
+      "naive_fp16": {
+        "ms": 5.47,
+        "peak_gb": 2.38
+      },
+      "naive_matched_fp32": {
+        "ms": 8.62,
+        "peak_gb": 4.76
+      },
+      "compile_ma_fp32": {
+        "ms": 7.9,
+        "peak_gb": 5.29
+      },
+      "compile_ma_fp16": {
+        "ms": 4.15,
+        "peak_gb": 2.67
+      },
+      "flash": {
+        "ms": 1.71,
+        "peak_gb": 0.54
+      }
+    },
+    {
+      "B": 2000,
+      "naive_fp16": {
+        "ms": 8.93,
+        "peak_gb": 4.78
+      },
+      "naive_matched_fp32": {
+        "ms": 17.02,
+        "peak_gb": 9.5
+      },
+      "compile_ma_fp32": {
+        "ms": 15.64,
+        "peak_gb": 10.54
+      },
+      "compile_ma_fp16": {
+        "ms": 8.22,
+        "peak_gb": 5.29
+      },
+      "flash": {
+        "ms": 3.25,
+        "peak_gb": 0.54
+      }
+    },
+    {
+      "B": 3000,
+      "naive_fp16": {
+        "ms": 13.49,
+        "peak_gb": 7.17
+      },
+      "naive_matched_fp32": {
+        "ms": 22.97,
+        "peak_gb": 14.25
+      },
+      "compile_ma_fp32": {
+        "ms": 23.35,
+        "peak_gb": 14.22
+      },
+      "compile_ma_fp16": {
+        "ms": 12.93,
+        "peak_gb": 7.13
+      },
+      "flash": {
+        "ms": 5.6,
+        "peak_gb": 0.81
+      }
+    },
+    {
+      "B": 4000,
+      "naive_fp16": {
+        "ms": 19.34,
+        "peak_gb": 9.55
+      },
+      "naive_matched_fp32": {
+        "ms": 34.96,
+        "peak_gb": 19.0
+      },
+      "compile_ma_fp32": {
+        "ms": 30.37,
+        "peak_gb": 18.94
+      },
+      "compile_ma_fp16": {
+        "ms": 16.65,
+        "peak_gb": 9.5
+      },
+      "flash": {
+        "ms": 7.97,
+        "peak_gb": 1.07
+      }
+    },
+    {
+      "B": 5000,
+      "naive_fp16": {
+        "ms": 23.05,
+        "peak_gb": 11.94
+      },
+      "naive_matched_fp32": {
+        "ms": 36.62,
+        "peak_gb": 23.75
+      },
+      "compile_ma_fp32": {
+        "ms": 36.61,
+        "peak_gb": 23.75
+      },
+      "compile_ma_fp16": {
+        "ms": 22.82,
+        "peak_gb": 11.94
+      },
+      "flash": {
+        "ms": 7.85,
+        "peak_gb": 1.34
+      }
+    },
+    {
+      "B": 7000,
+      "naive_fp16": {
+        "ms": 31.68,
+        "peak_gb": 16.71
+      },
+      "naive_matched_fp32": {
+        "ms": 51.03,
+        "peak_gb": 33.24
+      },
+      "compile_ma_fp32": {
+        "ms": 51.16,
+        "peak_gb": 33.24
+      },
+      "compile_ma_fp16": {
+        "ms": 31.38,
+        "peak_gb": 16.71
+      },
+      "flash": {
+        "ms": 11.03,
+        "peak_gb": 1.87
+      }
+    },
+    {
+      "B": 10000,
+      "naive_fp16": {
+        "ms": 45.59,
+        "peak_gb": 23.87
+      },
+      "naive_matched_fp32": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OOM_call"
+      },
+      "compile_ma_fp32": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OOM_call"
+      },
+      "compile_ma_fp16": {
+        "ms": 45.11,
+        "peak_gb": 23.87
+      },
+      "flash": {
+        "ms": 15.75,
+        "peak_gb": 2.69
+      }
+    },
+    {
+      "B": 12000,
+      "naive_fp16": {
+        "ms": 55.41,
+        "peak_gb": 28.64
+      },
+      "naive_matched_fp32": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OOM_call"
+      },
+      "compile_ma_fp32": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OOM_call"
+      },
+      "compile_ma_fp16": {
+        "ms": 55.28,
+        "peak_gb": 28.64
+      },
+      "flash": {
+        "ms": 18.85,
+        "peak_gb": 3.23
+      }
+    },
+    {
+      "B": 15000,
+      "naive_fp16": {
+        "ms": 67.63,
+        "peak_gb": 35.8
+      },
+      "naive_matched_fp32": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OOM_call"
+      },
+      "compile_ma_fp32": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OOM_call"
+      },
+      "compile_ma_fp16": {
+        "ms": 67.67,
+        "peak_gb": 35.8
+      },
+      "flash": {
+        "ms": 23.63,
+        "peak_gb": 4.03
+      }
+    },
+    {
+      "B": 20000,
+      "naive_fp16": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OOM_call"
+      },
+      "naive_matched_fp32": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OOM_call"
+      },
+      "compile_ma_fp32": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OOM_call"
+      },
+      "compile_ma_fp16": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OOM_call"
+      },
+      "flash": {
+        "ms": 31.31,
+        "peak_gb": 5.38
+      }
+    },
+    {
+      "B": 50000,
+      "naive_fp16": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OOM_call"
+      },
+      "naive_matched_fp32": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OOM_call"
+      },
+      "compile_ma_fp32": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OOM_call"
+      },
+      "compile_ma_fp16": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OOM_call"
+      },
+      "flash": {
+        "ms": 78.8,
+        "peak_gb": 13.42
+      }
+    },
+    {
+      "B": 100000,
+      "naive_fp16": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OOM_call"
+      },
+      "naive_matched_fp32": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OOM_inputs"
+      },
+      "compile_ma_fp32": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OOM_inputs"
+      },
+      "compile_ma_fp16": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OOM_call"
+      },
+      "flash": {
+        "ms": 157.49,
+        "peak_gb": 26.84
+      }
+    },
+    {
+      "B": 150000,
+      "naive_fp16": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OOM_call"
+      },
+      "naive_matched_fp32": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OOM_inputs"
+      },
+      "compile_ma_fp32": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OOM_inputs"
+      },
+      "compile_ma_fp16": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OOM_call"
+      },
+      "flash": {
+        "ms": 236.05,
+        "peak_gb": 40.25
+      }
+    },
+    {
+      "B": 175000,
+      "naive_fp16": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OOM_inputs"
+      },
+      "naive_matched_fp32": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OOM_inputs"
+      },
+      "compile_ma_fp32": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OOM_inputs"
+      },
+      "compile_ma_fp16": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OOM_inputs"
+      },
+      "flash": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OOM_inputs"
+      }
+    }
+  ]
+}

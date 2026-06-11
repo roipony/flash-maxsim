@@ -1,0 +1,57 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "part": "train",
+  "torch": "2.8.0+cu128",
+  "protocol": "interleaved round-robin, 100MB L2 flush per call, CUDA-event median+IQR, compile warmup>=100 with subprocess autotune, per-method peak passes",
+  "rows": [
+    {
+      "B": 64,
+      "naive": {
+        "ms": 81.345,
+        "iqr": 0.1952
+      },
+      "recompute": {
+        "ms": 109.223,
+        "iqr": 0.2966
+      },
+      "flash_unified": {
+        "ms": 13.436,
+        "iqr": 0.1313
+      },
+      "flash_csr": {
+        "ms": 11.723,
+        "iqr": 0.1573
+      },
+      "peaks_gb": {
+        "naive": 51.762,
+        "recompute": 8.821,
+        "flash_unified": 0.239,
+        "flash_csr": 0.393
+      }
+    },
+    {
+      "B": 128,
+      "recompute": {
+        "ms": 426.625,
+        "iqr": 0.46
+      },
+      "flash_unified": {
+        "ms": 53.618,
+        "iqr": 0.415
+      },
+      "flash_csr": {
+        "ms": 45.979,
+        "iqr": 0.2527
+      },
+      "peaks_gb": {
+        "recompute": 17.512,
+        "flash_unified": 0.39,
+        "flash_csr": 1.035
+      },
+      "naive": {
+        "oom": true,
+        "note": "analytic S+gradS = 128GB FP32 > VRAM"
+      }
+    }
+  ]
+}

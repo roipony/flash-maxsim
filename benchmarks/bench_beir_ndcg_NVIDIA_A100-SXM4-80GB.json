@@ -1,0 +1,83 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "flash_maxsim_version": "0.2.1",
+  "encoder": "ColBERTv2",
+  "note": "BEIR end-to-end nDCG@10 / Recall@10. Naive FP32 chunked reference is the same kernel as tab:beir_ndcg; NQ-2.68M is OOC (Flash only, naive ref skipped).",
+  "results": [
+    {
+      "name": "hotpotqa-500K",
+      "Nq": 500,
+      "B": 500000,
+      "Lq": 32,
+      "dim": 128,
+      "chunks": 977,
+      "flash_wall_s": 26.3,
+      "naive_wall_s": 103.9,
+      "parity": {
+        "max_abs": 0.0006380081176757812,
+        "mean_abs": 8.483132842229679e-05
+      },
+      "flash_metrics": {
+        "ndcg@5": 0.5495242636075575,
+        "ndcg@10": 0.5680703152814558,
+        "recall@5": 0.6428571428571429,
+        "recall@10": 0.6956521739130435,
+        "n_eval": 322
+      },
+      "naive_metrics": {
+        "ndcg@5": 0.5495242636075575,
+        "ndcg@10": 0.5680703152814558,
+        "recall@5": 0.6428571428571429,
+        "recall@10": 0.6956521739130435,
+        "n_eval": 322
+      }
+    },
+    {
+      "name": "quora-523K",
+      "Nq": 500,
+      "B": 522931,
+      "Lq": 32,
+      "dim": 128,
+      "chunks": 1022,
+      "flash_wall_s": 24.7,
+      "naive_wall_s": 87.2,
+      "parity": {
+        "max_abs": 4.76837158203125e-06,
+        "mean_abs": 6.141079893495771e-07
+      },
+      "flash_metrics": {
+        "ndcg@5": 0.0,
+        "ndcg@10": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "n_eval": 500
+      },
+      "naive_metrics": {
+        "ndcg@5": 0.0,
+        "ndcg@10": 0.0,
+        "recall@5": 0.0,
+        "recall@10": 0.0,
+        "n_eval": 500
+      }
+    },
+    {
+      "name": "nq-2.68M",
+      "Nq": 500,
+      "B": 2681468,
+      "Lq": 32,
+      "dim": 128,
+      "chunks": 5238,
+      "flash_wall_s": 102.8,
+      "naive_wall_s": null,
+      "parity": null,
+      "note": "naive FP32 reference skipped \u2014 corpus exceeds GPU memory",
+      "flash_metrics": {
+        "ndcg@5": 0.4894635501386234,
+        "ndcg@10": 0.522339076158735,
+        "recall@5": 0.662,
+        "recall@10": 0.746,
+        "n_eval": 500
+      }
+    }
+  ]
+}

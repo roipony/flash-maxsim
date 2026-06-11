@@ -1,0 +1,540 @@
+{
+  "gpu": "NVIDIA H100 80GB HBM3",
+  "gpu_mem_gb": 85.0,
+  "configs": [
+    {
+      "label": "Textual (Lq=32, Ld=300, B=1K)",
+      "B": 1000,
+      "Lq": 32,
+      "Ld": 300,
+      "d": 128,
+      "sim_per_doc_mb": 0.04,
+      "flash_ms": 0.09,
+      "chunks": [
+        {
+          "chunk_size": 1,
+          "sim_mb": 0.0,
+          "latency_ms": 79.655,
+          "vs_flash": 886.61,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 2,
+          "sim_mb": 0.1,
+          "latency_ms": 40.034,
+          "vs_flash": 445.6,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 5,
+          "sim_mb": 0.2,
+          "latency_ms": 16.07,
+          "vs_flash": 178.87,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 10,
+          "sim_mb": 0.4,
+          "latency_ms": 8.135,
+          "vs_flash": 90.55,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 20,
+          "sim_mb": 0.8,
+          "latency_ms": 4.104,
+          "vs_flash": 45.68,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 50,
+          "sim_mb": 1.9,
+          "latency_ms": 1.661,
+          "vs_flash": 18.49,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 100,
+          "sim_mb": 3.8,
+          "latency_ms": 0.849,
+          "vs_flash": 9.45,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 200,
+          "sim_mb": 7.7,
+          "latency_ms": 0.447,
+          "vs_flash": 4.98,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 500,
+          "sim_mb": 19.2,
+          "latency_ms": 0.31,
+          "vs_flash": 3.45,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 1000,
+          "sim_mb": 38.4,
+          "latency_ms": 0.286,
+          "vs_flash": 3.18,
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "label": "Textual (Lq=32, Ld=300, B=5K)",
+      "B": 5000,
+      "Lq": 32,
+      "Ld": 300,
+      "d": 128,
+      "sim_per_doc_mb": 0.04,
+      "flash_ms": 0.191,
+      "chunks": [
+        {
+          "chunk_size": 1,
+          "sim_mb": 0.0,
+          "latency_ms": 398.778,
+          "vs_flash": 2092.63,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 2,
+          "sim_mb": 0.1,
+          "latency_ms": 201.126,
+          "vs_flash": 1055.43,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 5,
+          "sim_mb": 0.2,
+          "latency_ms": 80.996,
+          "vs_flash": 425.04,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 10,
+          "sim_mb": 0.4,
+          "latency_ms": 40.558,
+          "vs_flash": 212.83,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 20,
+          "sim_mb": 0.8,
+          "latency_ms": 20.314,
+          "vs_flash": 106.6,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 50,
+          "sim_mb": 1.9,
+          "latency_ms": 8.141,
+          "vs_flash": 42.72,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 100,
+          "sim_mb": 3.8,
+          "latency_ms": 4.096,
+          "vs_flash": 21.49,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 200,
+          "sim_mb": 7.7,
+          "latency_ms": 2.071,
+          "vs_flash": 10.87,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 500,
+          "sim_mb": 19.2,
+          "latency_ms": 1.476,
+          "vs_flash": 7.75,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 1000,
+          "sim_mb": 38.4,
+          "latency_ms": 1.337,
+          "vs_flash": 7.02,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 2000,
+          "sim_mb": 76.8,
+          "latency_ms": 1.273,
+          "vs_flash": 6.68,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 5000,
+          "sim_mb": 192.0,
+          "latency_ms": 1.215,
+          "vs_flash": 6.38,
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "label": "Medium (Lq=128, Ld=1024, B=1K)",
+      "B": 1000,
+      "Lq": 128,
+      "Ld": 1024,
+      "d": 128,
+      "sim_per_doc_mb": 0.52,
+      "flash_ms": 0.161,
+      "chunks": [
+        {
+          "chunk_size": 1,
+          "sim_mb": 0.5,
+          "latency_ms": 80.569,
+          "vs_flash": 500.73,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 2,
+          "sim_mb": 1.0,
+          "latency_ms": 40.383,
+          "vs_flash": 250.98,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 5,
+          "sim_mb": 2.6,
+          "latency_ms": 16.156,
+          "vs_flash": 100.41,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 10,
+          "sim_mb": 5.2,
+          "latency_ms": 8.089,
+          "vs_flash": 50.27,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 20,
+          "sim_mb": 10.5,
+          "latency_ms": 4.041,
+          "vs_flash": 25.12,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 50,
+          "sim_mb": 26.2,
+          "latency_ms": 2.147,
+          "vs_flash": 13.34,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 100,
+          "sim_mb": 52.4,
+          "latency_ms": 1.898,
+          "vs_flash": 11.8,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 200,
+          "sim_mb": 104.9,
+          "latency_ms": 1.732,
+          "vs_flash": 10.77,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 500,
+          "sim_mb": 262.1,
+          "latency_ms": 1.6,
+          "vs_flash": 9.94,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 1000,
+          "sim_mb": 524.3,
+          "latency_ms": 1.561,
+          "vs_flash": 9.7,
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "label": "Visual (Lq=1024, Ld=1024, B=1K)",
+      "B": 1000,
+      "Lq": 1024,
+      "Ld": 1024,
+      "d": 128,
+      "sim_per_doc_mb": 4.19,
+      "flash_ms": 0.906,
+      "chunks": [
+        {
+          "chunk_size": 1,
+          "sim_mb": 4.2,
+          "latency_ms": 80.254,
+          "vs_flash": 88.61,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 2,
+          "sim_mb": 8.4,
+          "latency_ms": 40.912,
+          "vs_flash": 45.17,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 5,
+          "sim_mb": 21.0,
+          "latency_ms": 16.29,
+          "vs_flash": 17.99,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 10,
+          "sim_mb": 41.9,
+          "latency_ms": 12.994,
+          "vs_flash": 14.35,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 20,
+          "sim_mb": 83.9,
+          "latency_ms": 11.57,
+          "vs_flash": 12.77,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 50,
+          "sim_mb": 209.7,
+          "latency_ms": 10.241,
+          "vs_flash": 11.31,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 100,
+          "sim_mb": 419.4,
+          "latency_ms": 9.787,
+          "vs_flash": 10.81,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 200,
+          "sim_mb": 838.9,
+          "latency_ms": 9.541,
+          "vs_flash": 10.53,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 500,
+          "sim_mb": 2097.2,
+          "latency_ms": 9.389,
+          "vs_flash": 10.37,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 1000,
+          "sim_mb": 4194.3,
+          "latency_ms": 9.434,
+          "vs_flash": 10.42,
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "label": "Visual (Lq=1024, Ld=1024, B=5K)",
+      "B": 5000,
+      "Lq": 1024,
+      "Ld": 1024,
+      "d": 128,
+      "sim_per_doc_mb": 4.19,
+      "flash_ms": 4.08,
+      "chunks": [
+        {
+          "chunk_size": 1,
+          "sim_mb": 4.2,
+          "latency_ms": 403.265,
+          "vs_flash": 98.84,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 2,
+          "sim_mb": 8.4,
+          "latency_ms": 204.377,
+          "vs_flash": 50.09,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 5,
+          "sim_mb": 21.0,
+          "latency_ms": 80.614,
+          "vs_flash": 19.76,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 10,
+          "sim_mb": 41.9,
+          "latency_ms": 64.459,
+          "vs_flash": 15.8,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 20,
+          "sim_mb": 83.9,
+          "latency_ms": 57.387,
+          "vs_flash": 14.07,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 50,
+          "sim_mb": 209.7,
+          "latency_ms": 50.92,
+          "vs_flash": 12.48,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 100,
+          "sim_mb": 419.4,
+          "latency_ms": 48.708,
+          "vs_flash": 11.94,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 200,
+          "sim_mb": 838.9,
+          "latency_ms": 47.617,
+          "vs_flash": 11.67,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 500,
+          "sim_mb": 2097.2,
+          "latency_ms": 46.796,
+          "vs_flash": 11.47,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 1000,
+          "sim_mb": 4194.3,
+          "latency_ms": 46.988,
+          "vs_flash": 11.52,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 2000,
+          "sim_mb": 8388.6,
+          "latency_ms": 47.676,
+          "vs_flash": 11.69,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 5000,
+          "sim_mb": 20971.5,
+          "latency_ms": 46.902,
+          "vs_flash": 11.5,
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "label": "Visual (Lq=1024, Ld=1024, B=10K)",
+      "B": 10000,
+      "Lq": 1024,
+      "Ld": 1024,
+      "d": 128,
+      "sim_per_doc_mb": 4.19,
+      "flash_ms": 8.713,
+      "chunks": [
+        {
+          "chunk_size": 1,
+          "sim_mb": 4.2,
+          "latency_ms": 802.738,
+          "vs_flash": 92.13,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 2,
+          "sim_mb": 8.4,
+          "latency_ms": 408.467,
+          "vs_flash": 46.88,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 5,
+          "sim_mb": 21.0,
+          "latency_ms": 162.024,
+          "vs_flash": 18.6,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 10,
+          "sim_mb": 41.9,
+          "latency_ms": 128.656,
+          "vs_flash": 14.77,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 20,
+          "sim_mb": 83.9,
+          "latency_ms": 114.4,
+          "vs_flash": 13.13,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 50,
+          "sim_mb": 209.7,
+          "latency_ms": 101.2,
+          "vs_flash": 11.61,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 100,
+          "sim_mb": 419.4,
+          "latency_ms": 96.751,
+          "vs_flash": 11.1,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 200,
+          "sim_mb": 838.9,
+          "latency_ms": 94.613,
+          "vs_flash": 10.86,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 500,
+          "sim_mb": 2097.2,
+          "latency_ms": 93.575,
+          "vs_flash": 10.74,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 1000,
+          "sim_mb": 4194.3,
+          "latency_ms": 94.111,
+          "vs_flash": 10.8,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 2000,
+          "sim_mb": 8388.6,
+          "latency_ms": 95.623,
+          "vs_flash": 10.97,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 5000,
+          "sim_mb": 20971.5,
+          "latency_ms": 93.171,
+          "vs_flash": 10.69,
+          "status": "ok"
+        },
+        {
+          "chunk_size": 10000,
+          "sim_mb": 41943.0,
+          "latency_ms": null,
+          "status": "OOM"
+        }
+      ]
+    }
+  ]
+}

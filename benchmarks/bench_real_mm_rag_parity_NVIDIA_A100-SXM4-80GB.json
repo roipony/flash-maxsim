@@ -1,0 +1,183 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "torch_version": "2.8.0+cu128",
+  "flash_maxsim_version": "0.2.1",
+  "results": [
+    {
+      "encoder": "colpali",
+      "dataset": "finreport",
+      "n_str": "2.7K",
+      "Nq": 100,
+      "B": 2687,
+      "Lq": 50,
+      "Ld": 1031,
+      "dim": 128,
+      "naive_wall_s": 0.425,
+      "flash_wall_s": 6.733,
+      "parity": {
+        "max_abs_delta": 0.00164031982421875,
+        "mean_abs_delta": 0.00021656005992554128,
+        "spearman_rho": 0.9999998211860657,
+        "top5_overlap": 0.998,
+        "top10_overlap": 1.0,
+        "top20_overlap": 0.9995
+      },
+      "model_meta": "vidore/colpali-v1.2",
+      "dataset_meta": "REAL-MM-RAG_FinReport_BEIR"
+    },
+    {
+      "encoder": "colpali",
+      "dataset": "finslides",
+      "n_str": "2.3K",
+      "Nq": 100,
+      "B": 2280,
+      "Lq": 50,
+      "Ld": 1031,
+      "dim": 128,
+      "naive_wall_s": 0.224,
+      "flash_wall_s": 0.024,
+      "parity": {
+        "max_abs_delta": 0.001468658447265625,
+        "mean_abs_delta": 0.00023068638984113932,
+        "spearman_rho": 0.9999998211860657,
+        "top5_overlap": 1.0,
+        "top10_overlap": 1.0,
+        "top20_overlap": 1.0
+      },
+      "model_meta": "vidore/colpali-v1.2",
+      "dataset_meta": "REAL-MM-RAG_FinSlides_BEIR"
+    },
+    {
+      "encoder": "colpali",
+      "dataset": "techreport",
+      "n_str": "1.7K",
+      "Nq": 100,
+      "B": 1674,
+      "Lq": 51,
+      "Ld": 1031,
+      "dim": 128,
+      "naive_wall_s": 0.15,
+      "flash_wall_s": 0.022,
+      "parity": {
+        "max_abs_delta": 0.001461029052734375,
+        "mean_abs_delta": 0.00020422339730430394,
+        "spearman_rho": 0.9999998211860657,
+        "top5_overlap": 1.0,
+        "top10_overlap": 1.0,
+        "top20_overlap": 1.0
+      },
+      "model_meta": "vidore/colpali-v1.2",
+      "dataset_meta": "REAL-MM-RAG_TechReport_BEIR"
+    },
+    {
+      "encoder": "colpali",
+      "dataset": "techslides",
+      "n_str": "2K",
+      "Nq": 100,
+      "B": 1963,
+      "Lq": 38,
+      "Ld": 1031,
+      "dim": 128,
+      "naive_wall_s": 0.16,
+      "flash_wall_s": 0.021,
+      "parity": {
+        "max_abs_delta": 0.001590728759765625,
+        "mean_abs_delta": 0.0001892974687507376,
+        "spearman_rho": 0.9999998211860657,
+        "top5_overlap": 1.0,
+        "top10_overlap": 1.0,
+        "top20_overlap": 1.0
+      },
+      "model_meta": "vidore/colpali-v1.2",
+      "dataset_meta": "REAL-MM-RAG_TechSlides_BEIR"
+    },
+    {
+      "encoder": "gve",
+      "dataset": "finreport",
+      "n_str": "2.7K",
+      "Nq": 853,
+      "B": 2687,
+      "Lq": 104,
+      "Ld": 729,
+      "dim": 128,
+      "naive_wall_s": 2.961,
+      "flash_wall_s": 69.369,
+      "parity": {
+        "max_abs_delta": 0.00896453857421875,
+        "mean_abs_delta": 0.001170280040241778,
+        "spearman_rho": 0.9999985098838806,
+        "top5_overlap": 0.9995310668229778,
+        "top10_overlap": 0.9989449003516999,
+        "top20_overlap": 0.9988276670574443
+      },
+      "model_meta": "",
+      "dataset_meta": ""
+    },
+    {
+      "encoder": "gve",
+      "dataset": "finslides",
+      "n_str": "2.3K",
+      "Nq": 1052,
+      "B": 2280,
+      "Lq": 112,
+      "Ld": 729,
+      "dim": 128,
+      "naive_wall_s": 3.345,
+      "flash_wall_s": 0.345,
+      "parity": {
+        "max_abs_delta": 0.00888824462890625,
+        "mean_abs_delta": 0.0012658683117479086,
+        "spearman_rho": 0.9999986290931702,
+        "top5_overlap": 0.9988593155893536,
+        "top10_overlap": 0.9995247148288974,
+        "top20_overlap": 0.9991444866920152
+      },
+      "model_meta": "",
+      "dataset_meta": ""
+    },
+    {
+      "encoder": "gve",
+      "dataset": "techreport",
+      "n_str": "1.7K",
+      "Nq": 1294,
+      "B": 1674,
+      "Lq": 100,
+      "Ld": 729,
+      "dim": 128,
+      "naive_wall_s": 2.704,
+      "flash_wall_s": 0.309,
+      "parity": {
+        "max_abs_delta": 0.007907867431640625,
+        "mean_abs_delta": 0.0011370913125574589,
+        "spearman_rho": 0.9999988079071045,
+        "top5_overlap": 0.9995363214837713,
+        "top10_overlap": 0.9990726429675425,
+        "top20_overlap": 0.9991499227202473
+      },
+      "model_meta": "",
+      "dataset_meta": ""
+    },
+    {
+      "encoder": "gve",
+      "dataset": "techslides",
+      "n_str": "2K",
+      "Nq": 1354,
+      "B": 1963,
+      "Lq": 88,
+      "Ld": 729,
+      "dim": 128,
+      "naive_wall_s": 2.922,
+      "flash_wall_s": 0.375,
+      "parity": {
+        "max_abs_delta": 0.007556915283203125,
+        "mean_abs_delta": 0.0009292595204897225,
+        "spearman_rho": 0.9999989867210388,
+        "top5_overlap": 0.9994091580502216,
+        "top10_overlap": 0.9992614475627769,
+        "top20_overlap": 0.9994460856720827
+      },
+      "model_meta": "",
+      "dataset_meta": ""
+    }
+  ]
+}

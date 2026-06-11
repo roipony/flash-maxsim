@@ -1,0 +1,100 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "torch_version": "2.8.0+cu128",
+  "rows": [
+    {
+      "name": "ColBERT B=128",
+      "B": 128,
+      "Lq": 32,
+      "Ld": 180,
+      "naive": {
+        "ms": 7.14,
+        "peak_gb": 0.74
+      },
+      "flash": {
+        "ms": 1.36,
+        "peak_gb": 0.044
+      },
+      "speedup": 5.25,
+      "mem_ratio": 16.8
+    },
+    {
+      "name": "ColBERT B=1024",
+      "B": 1024,
+      "Lq": 32,
+      "Ld": 180,
+      "naive": {
+        "ms": 349.71,
+        "peak_gb": 45.177
+      },
+      "flash": {
+        "ms": 55.65,
+        "peak_gb": 0.351
+      },
+      "speedup": 6.28,
+      "mem_ratio": 128.7
+    },
+    {
+      "name": "ColBERT B=2048",
+      "B": 2048,
+      "Lq": 32,
+      "Ld": 180,
+      "naive": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OutOfMemoryError"
+      },
+      "flash": {
+        "ms": 229.93,
+        "peak_gb": 0.947
+      }
+    },
+    {
+      "name": "ColPali B=32",
+      "B": 32,
+      "Lq": 1024,
+      "Ld": 1024,
+      "naive": {
+        "ms": 56.5,
+        "peak_gb": 8.064
+      },
+      "flash": {
+        "ms": 3.87,
+        "peak_gb": 0.076
+      },
+      "speedup": 14.6,
+      "mem_ratio": 106.1
+    },
+    {
+      "name": "ColPali B=64",
+      "B": 64,
+      "Lq": 1024,
+      "Ld": 1024,
+      "naive": {
+        "ms": 219.99,
+        "peak_gb": 32.111
+      },
+      "flash": {
+        "ms": 13.48,
+        "peak_gb": 0.142
+      },
+      "speedup": 16.32,
+      "mem_ratio": 226.1
+    },
+    {
+      "name": "ColPali B=128",
+      "B": 128,
+      "Lq": 1024,
+      "Ld": 1024,
+      "naive": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OutOfMemoryError"
+      },
+      "flash": {
+        "ms": 54.67,
+        "peak_gb": 0.298
+      }
+    }
+  ]
+}
