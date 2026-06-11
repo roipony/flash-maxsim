@@ -1,0 +1,23 @@
+{
+  "gpu": "NVIDIA H100 80GB HBM3",
+  "Lq": 1024,
+  "Ld": 1024,
+  "d": 128,
+  "B": 1000,
+  "flash_fp16": {
+    "max_abs_err": 0.0001220703125,
+    "max_rel_err": 4.1830057284641953e-07,
+    "mean_rel_err": 1.7323158374438208e-07,
+    "top20_overlap": 1.0,
+    "top50_overlap": 1.0,
+    "spearman_rho": 0.9999998807907104
+  },
+  "flash_int8": {
+    "max_abs_err": 0.090850830078125,
+    "max_rel_err": 0.00031319475965574384,
+    "mean_rel_err": 7.585225102957338e-05,
+    "top20_overlap": 0.95,
+    "top50_overlap": 0.98,
+    "spearman_rho": 0.9995574951171875
+  }
+}

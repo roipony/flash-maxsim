@@ -1,0 +1,31 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "shapes": [
+    {
+      "d": 128,
+      "B": 128,
+      "Lq": 1024,
+      "Ld": 1024,
+      "dispatch": "in-shot",
+      "capture": "ok",
+      "replay_max_abs_delta": 0.0,
+      "correctness": "OK",
+      "replay_ms": 0.2199,
+      "direct_ms": 0.356,
+      "graph_speedup_vs_direct": 1.619
+    },
+    {
+      "d": 512,
+      "B": 128,
+      "Lq": 1024,
+      "Ld": 1024,
+      "dispatch": "split-d",
+      "capture": "ok",
+      "replay_max_abs_delta": 0.0,
+      "correctness": "OK",
+      "replay_ms": 1.2681,
+      "direct_ms": 1.4079,
+      "graph_speedup_vs_direct": 1.11
+    }
+  ]
+}

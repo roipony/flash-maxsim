@@ -4,7 +4,7 @@ Usage:
     python benchmarks/collect_data.py
     # produces benchmarks/results_<GPU_NAME>.json
 """
-import json, time, torch, torch.nn.functional as F
+import json, torch, torch.nn.functional as F
 
 import triton
 assert torch.cuda.is_available(), "CUDA required"
@@ -13,15 +13,7 @@ print(f"GPU: {gpu_name}\n")
 
 from flash_maxsim import flash_maxsim, flash_maxsim_batched
 from flash_maxsim import flash_maxsim_int8, quantize_int8
-
-def bench(fn, *a, warmup=10, n=50):
-    for _ in range(warmup): fn(*a)
-    torch.cuda.synchronize()
-    t = []
-    for _ in range(n):
-        torch.cuda.synchronize(); s = time.perf_counter(); fn(*a)
-        torch.cuda.synchronize(); t.append((time.perf_counter()-s)*1000)
-    t.sort(); return t[len(t)//2]
+from utils import bench_interleaved, compile_high_precision
 
 def make(B, Lq, Ld, d=128):
     Q = F.normalize(torch.randn(Lq, d, device='cuda', dtype=torch.float16), dim=-1)
@@ -30,6 +22,9 @@ def make(B, Lq, Ld, d=128):
 
 def naive_fp32(Q, D):
     return torch.einsum('qd,bld->bql', Q.float(), D.float()).max(2).values.sum(1)
+
+torch.set_float32_matmul_precision('high')
+compiled_fp32 = compile_high_precision(naive_fp32)
 
 results = {"gpu": gpu_name, "torch": torch.__version__, "triton": triton.__version__}
 
@@ -47,16 +42,17 @@ for Lq in [32, 128, 512, 1024]:
             print(f"  Lq={Lq}, Ld={Ld}: skip (would OOM naive)")
             continue
         Q, D = make(B, Lq, Ld)
-        wup = 5 if Lq >= 512 else 10
-        iters = 20 if Lq >= 512 else 40
         try:
-            n = bench(naive_fp32, Q, D, warmup=wup, n=iters)
+            n, c, f = bench_interleaved([naive_fp32, compiled_fp32, flash_maxsim], [[Q, D]])
         except RuntimeError:
             n = float('nan')
-        f = bench(flash_maxsim, Q, D, warmup=wup, n=iters)
-        sp = n / f if n == n else float('nan')
-        print(f"  Lq={Lq:4d}, Ld={Ld:4d}: naive={n:7.2f}ms  flash={f:7.2f}ms  {sp:.1f}x")
-        sweep_seq.append({"Lq": Lq, "Ld": Ld, "B": B, "naive_ms": round(n, 3), "flash_ms": round(f, 3), "speedup": round(sp, 1)})
+            c, f = bench_interleaved([compiled_fp32, flash_maxsim], [[Q, D]])
+        c_sp = c/f
+        n_sp = n / f if n == n else float('nan')
+        print(f"  Lq={Lq:4d}, Ld={Ld:4d}: naive={n:7.2f}ms compiled={c:7.2f}ms flash={f:7.2f}ms "
+              f"naive_speedup={n_sp:.1f}x compiled_speedup={c_sp:.1f}x")
+        sweep_seq.append({"Lq": Lq, "Ld": Ld, "B": B, "naive_ms": round(n, 3), "flash_ms": round(f, 3),
+                          "naive_speedup": round(n_sp, 1), "compiled_speedup": round(c_sp, 1)})
         del Q, D; torch.cuda.empty_cache()
 results["sweep_seq"] = sweep_seq
 
@@ -79,21 +75,22 @@ for Lq, Ld, tag in configs:
             print(f"  {tag} B={B}: skip (would OOM naive)")
             # still benchmark flash
             Q, D = make(B, Lq, Ld)
-            f = bench(flash_maxsim, Q, D, warmup=5, n=20)
+            f = bench_interleaved([flash_maxsim], [[Q, D]]).item()
             sweep_corpus.append({"Lq": Lq, "Ld": Ld, "B": B, "tag": tag, "naive_ms": float('nan'), "flash_ms": round(f, 3), "speedup": float('nan')})
             del Q, D; torch.cuda.empty_cache()
             continue
         Q, D = make(B, Lq, Ld)
-        wup = 5 if Lq >= 512 else 10
-        iters = 20 if Lq >= 512 else 40
         try:
-            n = bench(naive_fp32, Q, D, warmup=wup, n=iters)
+            n, c, f = bench_interleaved([naive_fp32, compiled_fp32, flash_maxsim], [[Q, D]]).item()
         except RuntimeError:
             n = float('nan')
-        f = bench(flash_maxsim, Q, D, warmup=wup, n=iters)
-        sp = n / f if n == n else float('nan')
-        print(f"  {tag:10s} B={B:5d}: naive={n:8.2f}ms  flash={f:7.2f}ms  {sp:.1f}x")
-        sweep_corpus.append({"Lq": Lq, "Ld": Ld, "B": B, "tag": tag, "naive_ms": round(n, 3), "flash_ms": round(f, 3), "speedup": round(sp, 1)})
+            c, f = bench_interleaved([compiled_fp32, flash_maxsim], [[Q, D]])
+        n_sp = n / f if n == n else float('nan')
+        c_sp = c / f
+        print(f"  {tag:10s} B={B:5d}: naive={n:8.2f}ms compiled={c:8.2f}ms flash={f:7.2f}ms  "
+              f"naive_speedup={n_sp:.1f}x compiled_speedup={c_sp:.1f}x")
+        sweep_corpus.append({"Lq": Lq, "Ld": Ld, "B": B, "tag": tag, "naive_ms": round(n, 3), "compiled_ms": round(c, 3),
+                             "flash_ms": round(f, 3), "naive_speedup": round(n_sp, 1), "compiled_speedup": round(c_sp, 1)})
         del Q, D; torch.cuda.empty_cache()
 results["sweep_corpus"] = sweep_corpus
 
@@ -185,10 +182,10 @@ for B in [500, 1000, 2000, 5000]:
     for Lq, Ld, tag in [(32, 300, "textual"), (32, 1024, "long_doc")]:
         Q, D = make(B, Lq, Ld)
         Dq, s, m = quantize_int8(D)
-        nf = bench(naive_fp32, Q, D, warmup=5, n=30)
-        ff = bench(flash_maxsim, Q, D, warmup=5, n=30)
-        fi = bench(flash_maxsim_int8, Q, Dq, s, m, warmup=5, n=30)
-        print(f"  {tag:10s} B={B:5d}: naive_fp32={nf:.2f}ms  flash_fp16={ff:.2f}ms  flash_q8={fi:.2f}ms  q8_speedup={nf/fi:.1f}x")
+        nf, cf, ff, fi = bench_interleaved([naive_fp32, compiled_fp32, flash_maxsim, flash_maxsim_int8],
+                               [[Q, D], [Q, D], [Q, D], [Q, Dq, s, m]])
+        print(f"  {tag:10s} B={B:5d}: naive_fp32={nf:.2f}ms compiled_fp32={cf:.2f}ms flash_fp16={ff:.2f}ms  "
+              f"flash_q8={fi:.2f}ms  naive_q8_speedup={nf/fi:.1f}x compiled_q8_speedup={cf/fi:.1f}x")
         sweep_int8.append({"Lq": Lq, "Ld": Ld, "B": B, "tag": tag,
                            "naive_fp32_ms": round(nf, 3), "flash_fp16_ms": round(ff, 3),
                            "flash_q8_ms": round(fi, 3), "speedup_vs_naive": round(nf/fi, 1)})

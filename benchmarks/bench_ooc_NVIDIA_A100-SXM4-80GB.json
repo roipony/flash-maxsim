@@ -1,0 +1,39 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "vram_gb": 85.1,
+  "block": 20000,
+  "rows": [
+    {
+      "B": 100000,
+      "corpus_gb": 26.2,
+      "latency_s": 8.86,
+      "docs_per_s": 11289,
+      "gpu_peak_gb": 5.51,
+      "exceeds_vram": false
+    },
+    {
+      "B": 250000,
+      "corpus_gb": 65.5,
+      "latency_s": 4.66,
+      "docs_per_s": 53600,
+      "gpu_peak_gb": 5.24,
+      "exceeds_vram": false
+    },
+    {
+      "B": 500000,
+      "corpus_gb": 131.1,
+      "latency_s": 9.77,
+      "docs_per_s": 51165,
+      "gpu_peak_gb": 5.25,
+      "exceeds_vram": true
+    },
+    {
+      "B": 750000,
+      "corpus_gb": 196.6,
+      "latency_s": 14.24,
+      "docs_per_s": 52674,
+      "gpu_peak_gb": 5.25,
+      "exceeds_vram": true
+    }
+  ]
+}

@@ -1,0 +1,45 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "Lq": 32,
+  "d": 128,
+  "Ld_max": 512,
+  "B": 1000,
+  "buckets": [
+    {
+      "bucket": "uniform",
+      "label": "uniform [256,512]",
+      "B": 1000,
+      "Ld_max": 512,
+      "avg_ld": 390.4,
+      "max_ld": 512,
+      "rho": 0.762,
+      "naive_ms": 0.553,
+      "flash_ms": 0.171,
+      "speedup": 3.24
+    },
+    {
+      "bucket": "hotpotqa",
+      "label": "HotpotQA-like",
+      "B": 1000,
+      "Ld_max": 512,
+      "avg_ld": 120.4,
+      "max_ld": 512,
+      "rho": 0.235,
+      "naive_ms": 0.555,
+      "flash_ms": 0.13,
+      "speedup": 4.27
+    },
+    {
+      "bucket": "ragged",
+      "label": "highly ragged",
+      "B": 1000,
+      "Ld_max": 512,
+      "avg_ld": 71.4,
+      "max_ld": 512,
+      "rho": 0.139,
+      "naive_ms": 0.553,
+      "flash_ms": 0.12,
+      "speedup": 4.59
+    }
+  ]
+}

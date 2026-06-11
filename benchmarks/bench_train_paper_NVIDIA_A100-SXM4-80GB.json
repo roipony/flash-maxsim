@@ -1,0 +1,32 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "Lq": 1024,
+  "Ld": 1024,
+  "d": 128,
+  "rows": [
+    {
+      "B": 64,
+      "flash": {
+        "ms": 12.3,
+        "peak_gb": 0.4
+      },
+      "naive": {
+        "ms": 81.61,
+        "peak_gb": 51.72
+      },
+      "mem_ratio": 129.3
+    },
+    {
+      "B": 128,
+      "flash": {
+        "ms": 48.64,
+        "peak_gb": 1.43
+      },
+      "naive": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OutOfMemoryError"
+      }
+    }
+  ]
+}

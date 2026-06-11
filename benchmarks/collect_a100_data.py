@@ -1,6 +1,6 @@
 """Collect benchmark data for A100 — generates JSON for make_figure.py.
 
-Run: /u/pony/envs/flash_maxsim/bin/python benchmarks/collect_a100_data.py
+Run: python benchmarks/collect_a100_data.py
 """
 import json, sys, time, torch
 import torch.nn.functional as F

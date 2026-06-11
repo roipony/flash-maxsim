@@ -6,7 +6,7 @@ The ONLY difference is whether the sim matrix materializes in HBM.
 - Naive: einsum(FP16) → sim matrix in HBM → .float() → max → sum
 - Flash: FP16 dot in SRAM → FP32 max in registers → sum. No sim matrix.
 
-Run: /u/pony/envs/flash_maxsim/bin/python tests/bench_matched_precision.py
+Run: python tests/bench_matched_precision.py
 """
 import torch
 import torch.nn.functional as F

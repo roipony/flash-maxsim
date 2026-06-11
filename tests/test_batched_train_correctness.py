@@ -11,7 +11,7 @@ Verifies (against FP32 ground truth, TF32 off):
 import sys, torch
 import torch.nn.functional as F
 
-sys.path.insert(0, '/dccstor/ocr-ai/pony/projects/flash_maxsim')
+sys.path.insert(0, '/path/to/data')
 from flash_maxsim.flash_maxsim_batched_train import flash_maxsim_batched_train
 
 # TF32 off for true FP32 ground truth

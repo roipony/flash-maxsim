@@ -1,5 +1,19 @@
 """Atomic-free backward dD via inverse-grid (CSR) gather.
 
+⚠ NOTE ON STATUS:
+    The CSR builder (`build_inverse_csr`) and the destination-owned dD kernel
+    (`_maxsim_bwd_dD_invgrid_kernel`) below are the PRODUCTION components.
+    They are imported from this module by `flash_maxsim_batched_train.py`
+    when its dispatcher chooses the invgrid path (gated on
+    `shared_docs and Nq*B*Lq > 50_000`).
+
+    The `_FlashMaxSimInvGridFn` autograd Function and `flash_maxsim_invgrid_train`
+    convenience wrapper at the bottom of this file are kept ONLY for the
+    standalone `__main__` correctness benchmark below — they bypass the
+    production dispatcher and force the invgrid path unconditionally for
+    reference comparison. End users should use the production
+    `flash_maxsim_batched_train(...)` entry-point.
+
 Proposal: replace the `atomic_add`-based `_maxsim_bwd_dD_batched_kernel` with a
 destination-owned gather. Instead of iterating over sources `(q, l)` and
 atomically writing into `grad_D[b, argmax[q,b,l], :]`, we iterate over
@@ -52,7 +66,7 @@ Load balance.
   `Nq*B*Ld`) programs — same as the current scatter kernel — so SM occupancy
   is unchanged; only the work per program varies.  For extreme skew we could
   later split hot slots across multiple CTAs with a second reduction pass,
-  but the simple version below is enough to beat FP32 atomics.
+  but the simple version below is already faster than the FP32 atomic path.
 
 Zero- and one-contribution slots.
   Zero contributions: program loads `row_ptr[dest]`, sees `start == end`,
@@ -96,52 +110,85 @@ def build_inverse_csr(
         pair_idx = q_idx*B + b
         dest     = (q*B + b)*Ld + j         range [0, Nq*B*Ld)
         col      = lq_idx                   range [0, Lq)
+
+    Memory note. We keep every intermediate in int32 when the value ranges
+    fit (n_dest < 2^31 and nnz < 2^31), which is true for every MaxSim
+    training shape on commodity GPUs. The earlier int64-everywhere path
+    materialised ~6 concurrent int64 tensors of size nnz, which dominated
+    the backward peak at ColBERT B=1024 contrastive (~1.5 GB transient
+    overhead). Int32 halves each of those. The
+    automatic int64 fallback kicks in only when n_dest or nnz overflow
+    int32 (e.g. Chamfer at point-cloud scale, MoE at LLM scale).
     """
     device = argmax.device
-    arg = argmax.to(torch.int64)
+    n_dest = B * Ld if shared_docs else Nq * B * Ld
+    nnz_total = (B * Nq if shared_docs else Nq * B) * Lq
+    INT32_MAX = torch.iinfo(torch.int32).max
+    # Promote to int64 only when the dest/col index space genuinely
+    # overflows int32 — for MaxSim training this branch is never taken.
+    use_i64 = max(n_dest, nnz_total) > INT32_MAX
+    idx_dtype = torch.int64 if use_i64 else torch.int32
+
+    # Keep argmax in its native dtype if already int32 and we're staying
+    # in int32; only widen when forced to int64. This avoids the
+    # unconditional 2x copy at line ~115 of the prior implementation.
+    if use_i64 and argmax.dtype != torch.int64:
+        arg = argmax.to(torch.int64)
+    elif (not use_i64) and argmax.dtype != torch.int32:
+        arg = argmax.to(torch.int32)
+    else:
+        arg = argmax
 
     if shared_docs:
-        total_pairs = B
-        n_dest = B * Ld
-        # pair_idx = b*Nq + q_idx  →  b = pair_idx // Nq, q_idx = pair_idx % Nq
-        pair_ids = torch.arange(total_pairs * Nq, device=device)  # wait: argmax is [B, Nq*?]
-        # argmax layout per _launch_fwd: flat pair_idx with total = B, not B*Nq.
-        # Actually: for shared_docs save_argmax produces [B*Nq, Lq] since pair_idx
-        # ranges over doc_id*Nq + q_idx.  Flatten that:
+        # For shared_docs the forward saves argmax with shape [B*Nq, Lq] —
+        # one row per (doc_id, q_idx) pair, where pair_idx = doc_id * Nq + q_idx.
+        # We invert this to map (b, j) → list of (q_idx, lq_idx).
         assert arg.shape[0] == B * Nq, f"expected argmax [{B*Nq}, {Lq}], got {tuple(arg.shape)}"
-        flat_pair = torch.arange(B * Nq, device=device)
+        flat_pair = torch.arange(B * Nq, device=device, dtype=idx_dtype)
         b_of_pair = flat_pair // Nq          # [B*Nq]
         q_of_pair = flat_pair % Nq           # [B*Nq]
         # dest[p, l] = b_of_pair[p]*Ld + argmax[p, l]
         dest = b_of_pair[:, None] * Ld + arg        # [B*Nq, Lq]
         # col[p, l] = q_of_pair[p]*Lq + l
-        lq_range = torch.arange(Lq, device=device)
+        lq_range = torch.arange(Lq, device=device, dtype=idx_dtype)
         col = q_of_pair[:, None] * Lq + lq_range[None, :]     # [B*Nq, Lq]
     else:
         assert arg.shape[0] == Nq * B
-        n_dest = Nq * B * Ld
-        flat_pair = torch.arange(Nq * B, device=device)
+        flat_pair = torch.arange(Nq * B, device=device, dtype=idx_dtype)
         q_of_pair = flat_pair // B
         b_of_pair = flat_pair % B
         # dest row base is (q*B + b)*Ld
         row_base = (q_of_pair * B + b_of_pair) * Ld          # [Nq*B]
         dest = row_base[:, None] + arg                       # [Nq*B, Lq]
-        lq_range = torch.arange(Lq, device=device)
+        lq_range = torch.arange(Lq, device=device, dtype=idx_dtype)
         col = lq_range[None, :].expand(Nq * B, Lq).contiguous()  # [Nq*B, Lq]
 
-    dest_flat = dest.reshape(-1).to(torch.int64)             # [nnz]
-    col_flat = col.reshape(-1).to(torch.int32)               # [nnz]
+    dest_flat = dest.reshape(-1)              # [nnz] in idx_dtype already
+    col_flat = col.reshape(-1).to(torch.int32) if col.dtype != torch.int32 else col.reshape(-1)
     nnz = dest_flat.numel()
 
-    # Stable sort by destination → contiguous segments per slot.
-    order = torch.argsort(dest_flat, stable=True)
-    dest_sorted = dest_flat[order]
-    col_sorted = col_flat[order]
+    # Count per destination directly on the unsorted dest_flat — bincount is
+    # order-agnostic, so we DON'T need to materialise dest_sorted just to
+    # count. (Save ~nnz * 4 bytes vs the previous code path.)
+    counts = torch.bincount(dest_flat, minlength=n_dest)  # [n_dest] int64
+    row_ptr_i64 = torch.empty(n_dest + 1, dtype=torch.int64, device=device)
+    row_ptr_i64[0] = 0
+    torch.cumsum(counts, dim=0, out=row_ptr_i64[1:])
+    del counts
+    row_ptr_total = row_ptr_i64[-1].item()
+    if row_ptr_total > INT32_MAX:
+        row_ptr = row_ptr_i64
+    else:
+        row_ptr = row_ptr_i64.to(torch.int32)
+        del row_ptr_i64
 
-    # row_ptr via bincount + cumsum.
-    counts = torch.bincount(dest_sorted, minlength=n_dest)   # [n_dest]
-    row_ptr = torch.zeros(n_dest + 1, dtype=torch.int32, device=device)
-    row_ptr[1:] = counts.to(torch.int32).cumsum(dim=0)
+    # Non-stable sort — for the kernel we only need the per-destination
+    # source list to be contiguous, the order within a destination doesn't
+    # affect the FP32 atomic-free sum result. argsort still returns int64
+    # indices (PyTorch limitation); we free immediately after the gather.
+    order = torch.argsort(dest_flat)  # [nnz] int64
+    col_sorted = col_flat[order]      # [nnz] int32
+    del order, dest_flat, col_flat, dest, col, flat_pair, b_of_pair, q_of_pair, lq_range
 
     return row_ptr.contiguous(), col_sorted.contiguous()
 

@@ -2,8 +2,8 @@
 import sys, torch
 import torch.nn.functional as F
 
-sys.path.insert(0, '/dccstor/ocr-ai/pony/projects/flash_maxsim')
-sys.path.insert(0, '/dccstor/ocr-ai/pony/projects/pylate')
+sys.path.insert(0, '/path/to/data')
+sys.path.insert(0, '/path/to/data')
 
 # Step 1: top-level import (this is the public surface)
 from flash_maxsim import (

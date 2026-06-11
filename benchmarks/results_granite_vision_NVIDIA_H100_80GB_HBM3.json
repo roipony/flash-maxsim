@@ -1,0 +1,75 @@
+{
+  "gpu": "NVIDIA H100 80GB HBM3",
+  "model": "ibm-granite/granite-vision-3.3-2b-embedding",
+  "Lq": 38,
+  "Ld": 729,
+  "d": 128,
+  "Nq": 5,
+  "B": 20,
+  "all_rankings_match": true,
+  "scoring": [
+    {
+      "B": 20,
+      "naive_ms": 0.081,
+      "flash_ms": 0.066
+    },
+    {
+      "B": 100,
+      "naive_ms": 0.108,
+      "flash_ms": 0.064
+    },
+    {
+      "B": 200,
+      "naive_ms": 0.174,
+      "flash_ms": 0.069
+    },
+    {
+      "B": 500,
+      "naive_ms": 0.379,
+      "flash_ms": 0.098
+    },
+    {
+      "B": 1000,
+      "naive_ms": 0.692,
+      "flash_ms": 0.131
+    },
+    {
+      "B": 2000,
+      "naive_ms": 1.328,
+      "flash_ms": 0.184
+    }
+  ],
+  "int8": {
+    "fp16_ms": 0.065,
+    "q8_ms": 0.072,
+    "compression": 2.0,
+    "rank_match": true,
+    "max_err": 0.0307
+  },
+  "memory": [
+    {
+      "B": 20,
+      "naive_mb": 9.7,
+      "flash_mb": 0.0,
+      "ratio": 9474.0
+    },
+    {
+      "B": 100,
+      "naive_mb": 48.4,
+      "flash_mb": 0.0,
+      "ratio": 47290.0
+    },
+    {
+      "B": 500,
+      "naive_mb": 242.0,
+      "flash_mb": 0.0,
+      "ratio": 59094.0
+    },
+    {
+      "B": 1000,
+      "naive_mb": 484.4,
+      "flash_mb": 0.01,
+      "ratio": 59133.0
+    }
+  ]
+}

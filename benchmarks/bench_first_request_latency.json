@@ -1,0 +1,29 @@
+{
+  "regimes": [
+    {
+      "regime": "A",
+      "warmup_s": 0.0,
+      "first_request_ms_d128": 9678.0,
+      "second_request_ms_d128": 0.54,
+      "first_request_ms_d512_splitd": 13888.75,
+      "second_request_ms_d512_splitd": 1.75
+    },
+    {
+      "regime": "B",
+      "warmup_s": 0.0,
+      "first_request_ms_d128": 2239.87,
+      "second_request_ms_d128": 0.55,
+      "first_request_ms_d512_splitd": 13105.41,
+      "second_request_ms_d512_splitd": 1.51
+    },
+    {
+      "regime": "C",
+      "warmup_s": 10.923,
+      "first_request_ms_d128": 0.55,
+      "second_request_ms_d128": 0.36,
+      "first_request_ms_d512_splitd": 1.44,
+      "second_request_ms_d512_splitd": 1.43
+    }
+  ],
+  "gpu": "NVIDIA A100-SXM4-80GB"
+}

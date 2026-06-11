@@ -1,0 +1,799 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "vram_gb": 85.1,
+  "torch": "2.8.0+cu128",
+  "note": "Production-default inference baseline: FP16 eager + corpus chunking, no torch.compile, no FP32 promotion. For each cell the BEST chunk size (lowest non-OOM median latency) is reported.",
+  "rows": [
+    {
+      "label": "textual",
+      "Lq": 32,
+      "Ld": 300,
+      "B": 1000,
+      "d_gb": 0.077,
+      "s_full_gb": 0.019,
+      "flash": {
+        "ms": 0.197,
+        "peak_gb": 0.346,
+        "ok": true
+      },
+      "vanilla_fp16_eager": {
+        "ms": 0.187,
+        "peak_gb": 0.106,
+        "ok": true
+      },
+      "chunked_fp16_eager_sweep": [
+        {
+          "ms": 125.48,
+          "peak_gb": 0.086,
+          "ok": true,
+          "chunk": 1,
+          "sim_chunk_gb": 0.0
+        },
+        {
+          "ms": 32.536,
+          "peak_gb": 0.086,
+          "ok": true,
+          "chunk": 4,
+          "sim_chunk_gb": 0.0
+        },
+        {
+          "ms": 7.299,
+          "peak_gb": 0.087,
+          "ok": true,
+          "chunk": 16,
+          "sim_chunk_gb": 0.0
+        },
+        {
+          "ms": 1.856,
+          "peak_gb": 0.089,
+          "ok": true,
+          "chunk": 64,
+          "sim_chunk_gb": 0.001
+        },
+        {
+          "ms": 0.508,
+          "peak_gb": 0.096,
+          "ok": true,
+          "chunk": 256,
+          "sim_chunk_gb": 0.005
+        }
+      ],
+      "chunked_fp16_eager_best": {
+        "ms": 0.508,
+        "peak_gb": 0.096,
+        "ok": true,
+        "chunk": 256,
+        "sim_chunk_gb": 0.005
+      },
+      "best_chunk_vs_flash": 2.58
+    },
+    {
+      "label": "long-doc",
+      "Lq": 32,
+      "Ld": 1024,
+      "B": 1000,
+      "d_gb": 0.262,
+      "s_full_gb": 0.066,
+      "flash": {
+        "ms": 0.297,
+        "peak_gb": 0.271,
+        "ok": true
+      },
+      "vanilla_fp16_eager": {
+        "ms": 0.404,
+        "peak_gb": 0.337,
+        "ok": true
+      },
+      "chunked_fp16_eager_sweep": [
+        {
+          "ms": 131.87,
+          "peak_gb": 0.271,
+          "ok": true,
+          "chunk": 1,
+          "sim_chunk_gb": 0.0
+        },
+        {
+          "ms": 30.647,
+          "peak_gb": 0.271,
+          "ok": true,
+          "chunk": 4,
+          "sim_chunk_gb": 0.0
+        },
+        {
+          "ms": 7.618,
+          "peak_gb": 0.273,
+          "ok": true,
+          "chunk": 16,
+          "sim_chunk_gb": 0.001
+        },
+        {
+          "ms": 2.001,
+          "peak_gb": 0.279,
+          "ok": true,
+          "chunk": 64,
+          "sim_chunk_gb": 0.004
+        },
+        {
+          "ms": 0.53,
+          "peak_gb": 0.304,
+          "ok": true,
+          "chunk": 256,
+          "sim_chunk_gb": 0.017
+        }
+      ],
+      "chunked_fp16_eager_best": {
+        "ms": 0.53,
+        "peak_gb": 0.304,
+        "ok": true,
+        "chunk": 256,
+        "sim_chunk_gb": 0.017
+      },
+      "best_chunk_vs_flash": 1.78
+    },
+    {
+      "label": "medium",
+      "Lq": 128,
+      "Ld": 1024,
+      "B": 1000,
+      "d_gb": 0.262,
+      "s_full_gb": 0.262,
+      "flash": {
+        "ms": 0.352,
+        "peak_gb": 0.539,
+        "ok": true
+      },
+      "vanilla_fp16_eager": {
+        "ms": 0.736,
+        "peak_gb": 0.534,
+        "ok": true
+      },
+      "chunked_fp16_eager_sweep": [
+        {
+          "ms": 120.012,
+          "peak_gb": 0.271,
+          "ok": true,
+          "chunk": 1,
+          "sim_chunk_gb": 0.0
+        },
+        {
+          "ms": 31.866,
+          "peak_gb": 0.273,
+          "ok": true,
+          "chunk": 4,
+          "sim_chunk_gb": 0.001
+        },
+        {
+          "ms": 8.259,
+          "peak_gb": 0.279,
+          "ok": true,
+          "chunk": 16,
+          "sim_chunk_gb": 0.004
+        },
+        {
+          "ms": 2.375,
+          "peak_gb": 0.304,
+          "ok": true,
+          "chunk": 64,
+          "sim_chunk_gb": 0.017
+        },
+        {
+          "ms": 0.879,
+          "peak_gb": 0.405,
+          "ok": true,
+          "chunk": 256,
+          "sim_chunk_gb": 0.067
+        }
+      ],
+      "chunked_fp16_eager_best": {
+        "ms": 0.879,
+        "peak_gb": 0.405,
+        "ok": true,
+        "chunk": 256,
+        "sim_chunk_gb": 0.067
+      },
+      "best_chunk_vs_flash": 2.5
+    },
+    {
+      "label": "visual",
+      "Lq": 512,
+      "Ld": 1024,
+      "B": 1000,
+      "d_gb": 0.262,
+      "s_full_gb": 1.049,
+      "flash": {
+        "ms": 1.107,
+        "peak_gb": 0.271,
+        "ok": true
+      },
+      "vanilla_fp16_eager": {
+        "ms": 2.51,
+        "peak_gb": 1.324,
+        "ok": true
+      },
+      "chunked_fp16_eager_sweep": [
+        {
+          "ms": 128.904,
+          "peak_gb": 0.273,
+          "ok": true,
+          "chunk": 1,
+          "sim_chunk_gb": 0.001
+        },
+        {
+          "ms": 36.778,
+          "peak_gb": 0.279,
+          "ok": true,
+          "chunk": 4,
+          "sim_chunk_gb": 0.004
+        },
+        {
+          "ms": 8.394,
+          "peak_gb": 0.304,
+          "ok": true,
+          "chunk": 16,
+          "sim_chunk_gb": 0.017
+        },
+        {
+          "ms": 3.1,
+          "peak_gb": 0.405,
+          "ok": true,
+          "chunk": 64,
+          "sim_chunk_gb": 0.067
+        },
+        {
+          "ms": 2.647,
+          "peak_gb": 0.808,
+          "ok": true,
+          "chunk": 256,
+          "sim_chunk_gb": 0.268
+        }
+      ],
+      "chunked_fp16_eager_best": {
+        "ms": 2.647,
+        "peak_gb": 0.808,
+        "ok": true,
+        "chunk": 256,
+        "sim_chunk_gb": 0.268
+      },
+      "best_chunk_vs_flash": 2.39
+    },
+    {
+      "label": "ColPali",
+      "Lq": 1024,
+      "Ld": 1024,
+      "B": 1000,
+      "d_gb": 0.262,
+      "s_full_gb": 2.097,
+      "flash": {
+        "ms": 2.029,
+        "peak_gb": 0.271,
+        "ok": true
+      },
+      "vanilla_fp16_eager": {
+        "ms": 4.26,
+        "peak_gb": 2.378,
+        "ok": true
+      },
+      "chunked_fp16_eager_sweep": [
+        {
+          "ms": 140.295,
+          "peak_gb": 0.275,
+          "ok": true,
+          "chunk": 1,
+          "sim_chunk_gb": 0.002
+        },
+        {
+          "ms": 32.517,
+          "peak_gb": 0.288,
+          "ok": true,
+          "chunk": 4,
+          "sim_chunk_gb": 0.008
+        },
+        {
+          "ms": 9.403,
+          "peak_gb": 0.338,
+          "ok": true,
+          "chunk": 16,
+          "sim_chunk_gb": 0.034
+        },
+        {
+          "ms": 4.674,
+          "peak_gb": 0.539,
+          "ok": true,
+          "chunk": 64,
+          "sim_chunk_gb": 0.134
+        },
+        {
+          "ms": 4.31,
+          "peak_gb": 1.345,
+          "ok": true,
+          "chunk": 256,
+          "sim_chunk_gb": 0.537
+        }
+      ],
+      "chunked_fp16_eager_best": {
+        "ms": 4.31,
+        "peak_gb": 1.345,
+        "ok": true,
+        "chunk": 256,
+        "sim_chunk_gb": 0.537
+      },
+      "best_chunk_vs_flash": 2.12
+    },
+    {
+      "label": "ColPali",
+      "Lq": 1024,
+      "Ld": 1024,
+      "B": 5000,
+      "d_gb": 1.311,
+      "s_full_gb": 10.486,
+      "flash": {
+        "ms": 8.183,
+        "peak_gb": 1.32,
+        "ok": true
+      },
+      "vanilla_fp16_eager": {
+        "ms": 22.647,
+        "peak_gb": 11.939,
+        "ok": true
+      },
+      "chunked_fp16_eager_sweep": [
+        {
+          "ms": 706.28,
+          "peak_gb": 1.324,
+          "ok": true,
+          "chunk": 1,
+          "sim_chunk_gb": 0.002
+        },
+        {
+          "ms": 159.977,
+          "peak_gb": 1.336,
+          "ok": true,
+          "chunk": 4,
+          "sim_chunk_gb": 0.008
+        },
+        {
+          "ms": 43.003,
+          "peak_gb": 1.387,
+          "ok": true,
+          "chunk": 16,
+          "sim_chunk_gb": 0.034
+        },
+        {
+          "ms": 23.435,
+          "peak_gb": 1.588,
+          "ok": true,
+          "chunk": 64,
+          "sim_chunk_gb": 0.134
+        },
+        {
+          "ms": 21.863,
+          "peak_gb": 2.393,
+          "ok": true,
+          "chunk": 256,
+          "sim_chunk_gb": 0.537
+        },
+        {
+          "ms": 21.482,
+          "peak_gb": 5.614,
+          "ok": true,
+          "chunk": 1024,
+          "sim_chunk_gb": 2.147
+        },
+        {
+          "ms": 22.504,
+          "peak_gb": 11.805,
+          "ok": true,
+          "chunk": 4096,
+          "sim_chunk_gb": 8.59
+        }
+      ],
+      "chunked_fp16_eager_best": {
+        "ms": 21.482,
+        "peak_gb": 5.614,
+        "ok": true,
+        "chunk": 1024,
+        "sim_chunk_gb": 2.147
+      },
+      "best_chunk_vs_flash": 2.63
+    },
+    {
+      "label": "ColPali",
+      "Lq": 1024,
+      "Ld": 1024,
+      "B": 10000,
+      "d_gb": 2.621,
+      "s_full_gb": 20.972,
+      "flash": {
+        "ms": 16.387,
+        "peak_gb": 2.631,
+        "ok": true
+      },
+      "vanilla_fp16_eager": {
+        "ms": 45.939,
+        "peak_gb": 23.868,
+        "ok": true
+      },
+      "chunked_fp16_eager_sweep": [
+        {
+          "ms": 1401.95,
+          "peak_gb": 2.634,
+          "ok": true,
+          "chunk": 1,
+          "sim_chunk_gb": 0.002
+        },
+        {
+          "ms": 304.191,
+          "peak_gb": 2.647,
+          "ok": true,
+          "chunk": 4,
+          "sim_chunk_gb": 0.008
+        },
+        {
+          "ms": 91.202,
+          "peak_gb": 2.697,
+          "ok": true,
+          "chunk": 16,
+          "sim_chunk_gb": 0.034
+        },
+        {
+          "ms": 47.087,
+          "peak_gb": 2.899,
+          "ok": true,
+          "chunk": 64,
+          "sim_chunk_gb": 0.134
+        },
+        {
+          "ms": 44.081,
+          "peak_gb": 3.704,
+          "ok": true,
+          "chunk": 256,
+          "sim_chunk_gb": 0.537
+        },
+        {
+          "ms": 42.979,
+          "peak_gb": 6.925,
+          "ok": true,
+          "chunk": 1024,
+          "sim_chunk_gb": 2.147
+        },
+        {
+          "ms": 45.772,
+          "peak_gb": 19.81,
+          "ok": true,
+          "chunk": 4096,
+          "sim_chunk_gb": 8.59
+        }
+      ],
+      "chunked_fp16_eager_best": {
+        "ms": 42.979,
+        "peak_gb": 6.925,
+        "ok": true,
+        "chunk": 1024,
+        "sim_chunk_gb": 2.147
+      },
+      "best_chunk_vs_flash": 2.62
+    },
+    {
+      "label": "ColPali",
+      "Lq": 1024,
+      "Ld": 1024,
+      "B": 20000,
+      "d_gb": 5.243,
+      "s_full_gb": 41.943,
+      "flash": {
+        "ms": 32.614,
+        "peak_gb": 5.252,
+        "ok": true
+      },
+      "vanilla_fp16_eager": {
+        "ms": 92.939,
+        "peak_gb": 47.728,
+        "ok": true
+      },
+      "chunked_fp16_eager_sweep": [
+        {
+          "ms": 2648.531,
+          "peak_gb": 5.256,
+          "ok": true,
+          "chunk": 1,
+          "sim_chunk_gb": 0.002
+        },
+        {
+          "ms": 590.145,
+          "peak_gb": 5.268,
+          "ok": true,
+          "chunk": 4,
+          "sim_chunk_gb": 0.008
+        },
+        {
+          "ms": 167.889,
+          "peak_gb": 5.319,
+          "ok": true,
+          "chunk": 16,
+          "sim_chunk_gb": 0.034
+        },
+        {
+          "ms": 94.725,
+          "peak_gb": 5.52,
+          "ok": true,
+          "chunk": 64,
+          "sim_chunk_gb": 0.134
+        },
+        {
+          "ms": 87.758,
+          "peak_gb": 6.325,
+          "ok": true,
+          "chunk": 256,
+          "sim_chunk_gb": 0.537
+        },
+        {
+          "ms": 86.316,
+          "peak_gb": 9.547,
+          "ok": true,
+          "chunk": 1024,
+          "sim_chunk_gb": 2.147
+        },
+        {
+          "ms": 91.172,
+          "peak_gb": 22.432,
+          "ok": true,
+          "chunk": 4096,
+          "sim_chunk_gb": 8.59
+        },
+        {
+          "ms": 92.292,
+          "peak_gb": 47.195,
+          "ok": true,
+          "chunk": 16384,
+          "sim_chunk_gb": 34.36
+        }
+      ],
+      "chunked_fp16_eager_best": {
+        "ms": 86.316,
+        "peak_gb": 9.547,
+        "ok": true,
+        "chunk": 1024,
+        "sim_chunk_gb": 2.147
+      },
+      "best_chunk_vs_flash": 2.65
+    },
+    {
+      "label": "visual",
+      "Lq": 512,
+      "Ld": 1024,
+      "B": 5000,
+      "d_gb": 1.311,
+      "s_full_gb": 5.243,
+      "flash": {
+        "ms": 4.127,
+        "peak_gb": 1.319,
+        "ok": true
+      },
+      "vanilla_fp16_eager": {
+        "ms": 11.619,
+        "peak_gb": 6.63,
+        "ok": true
+      },
+      "chunked_fp16_eager_sweep": [
+        {
+          "ms": 611.954,
+          "peak_gb": 1.321,
+          "ok": true,
+          "chunk": 1,
+          "sim_chunk_gb": 0.001
+        },
+        {
+          "ms": 176.444,
+          "peak_gb": 1.328,
+          "ok": true,
+          "chunk": 4,
+          "sim_chunk_gb": 0.004
+        },
+        {
+          "ms": 40.196,
+          "peak_gb": 1.353,
+          "ok": true,
+          "chunk": 16,
+          "sim_chunk_gb": 0.017
+        },
+        {
+          "ms": 12.89,
+          "peak_gb": 1.454,
+          "ok": true,
+          "chunk": 64,
+          "sim_chunk_gb": 0.067
+        },
+        {
+          "ms": 11.293,
+          "peak_gb": 1.856,
+          "ok": true,
+          "chunk": 256,
+          "sim_chunk_gb": 0.268
+        },
+        {
+          "ms": 10.96,
+          "peak_gb": 3.467,
+          "ok": true,
+          "chunk": 1024,
+          "sim_chunk_gb": 1.074
+        },
+        {
+          "ms": 11.419,
+          "peak_gb": 6.562,
+          "ok": true,
+          "chunk": 4096,
+          "sim_chunk_gb": 4.295
+        }
+      ],
+      "chunked_fp16_eager_best": {
+        "ms": 10.96,
+        "peak_gb": 3.467,
+        "ok": true,
+        "chunk": 1024,
+        "sim_chunk_gb": 1.074
+      },
+      "best_chunk_vs_flash": 2.66
+    },
+    {
+      "label": "visual",
+      "Lq": 512,
+      "Ld": 1024,
+      "B": 10000,
+      "d_gb": 2.621,
+      "s_full_gb": 10.486,
+      "flash": {
+        "ms": 8.407,
+        "peak_gb": 2.63,
+        "ok": true
+      },
+      "vanilla_fp16_eager": {
+        "ms": 23.35,
+        "peak_gb": 13.25,
+        "ok": true
+      },
+      "chunked_fp16_eager_sweep": [
+        {
+          "ms": 1263.757,
+          "peak_gb": 2.632,
+          "ok": true,
+          "chunk": 1,
+          "sim_chunk_gb": 0.001
+        },
+        {
+          "ms": 353.606,
+          "peak_gb": 2.638,
+          "ok": true,
+          "chunk": 4,
+          "sim_chunk_gb": 0.004
+        },
+        {
+          "ms": 78.024,
+          "peak_gb": 2.664,
+          "ok": true,
+          "chunk": 16,
+          "sim_chunk_gb": 0.017
+        },
+        {
+          "ms": 25.789,
+          "peak_gb": 2.764,
+          "ok": true,
+          "chunk": 64,
+          "sim_chunk_gb": 0.067
+        },
+        {
+          "ms": 22.651,
+          "peak_gb": 3.167,
+          "ok": true,
+          "chunk": 256,
+          "sim_chunk_gb": 0.268
+        },
+        {
+          "ms": 21.838,
+          "peak_gb": 4.778,
+          "ok": true,
+          "chunk": 1024,
+          "sim_chunk_gb": 1.074
+        },
+        {
+          "ms": 22.841,
+          "peak_gb": 11.22,
+          "ok": true,
+          "chunk": 4096,
+          "sim_chunk_gb": 4.295
+        }
+      ],
+      "chunked_fp16_eager_best": {
+        "ms": 21.838,
+        "peak_gb": 4.778,
+        "ok": true,
+        "chunk": 1024,
+        "sim_chunk_gb": 1.074
+      },
+      "best_chunk_vs_flash": 2.6
+    },
+    {
+      "label": "visual",
+      "Lq": 512,
+      "Ld": 1024,
+      "B": 20000,
+      "d_gb": 5.243,
+      "s_full_gb": 20.972,
+      "flash": {
+        "ms": 16.774,
+        "peak_gb": 5.252,
+        "ok": true
+      },
+      "vanilla_fp16_eager": {
+        "ms": 46.813,
+        "peak_gb": 26.49,
+        "ok": true
+      },
+      "chunked_fp16_eager_sweep": [
+        {
+          "ms": 2504.105,
+          "peak_gb": 5.254,
+          "ok": true,
+          "chunk": 1,
+          "sim_chunk_gb": 0.001
+        },
+        {
+          "ms": 723.197,
+          "peak_gb": 5.26,
+          "ok": true,
+          "chunk": 4,
+          "sim_chunk_gb": 0.004
+        },
+        {
+          "ms": 163.384,
+          "peak_gb": 5.285,
+          "ok": true,
+          "chunk": 16,
+          "sim_chunk_gb": 0.017
+        },
+        {
+          "ms": 51.844,
+          "peak_gb": 5.386,
+          "ok": true,
+          "chunk": 64,
+          "sim_chunk_gb": 0.067
+        },
+        {
+          "ms": 45.327,
+          "peak_gb": 5.788,
+          "ok": true,
+          "chunk": 256,
+          "sim_chunk_gb": 0.268
+        },
+        {
+          "ms": 43.93,
+          "peak_gb": 7.399,
+          "ok": true,
+          "chunk": 1024,
+          "sim_chunk_gb": 1.074
+        },
+        {
+          "ms": 45.881,
+          "peak_gb": 13.842,
+          "ok": true,
+          "chunk": 4096,
+          "sim_chunk_gb": 4.295
+        },
+        {
+          "ms": 46.725,
+          "peak_gb": 26.223,
+          "ok": true,
+          "chunk": 16384,
+          "sim_chunk_gb": 17.18
+        }
+      ],
+      "chunked_fp16_eager_best": {
+        "ms": 43.93,
+        "peak_gb": 7.399,
+        "ok": true,
+        "chunk": 1024,
+        "sim_chunk_gb": 1.074
+      },
+      "best_chunk_vs_flash": 2.62
+    }
+  ]
+}

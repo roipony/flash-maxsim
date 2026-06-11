@@ -1,0 +1,115 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "varlen": [
+    {
+      "tag": "colbert_skewed",
+      "N": 500,
+      "avg_ld": 48.9,
+      "max_ld": 69,
+      "varlen_ms": 0.067,
+      "naive_ms": 0.113,
+      "speedup": 1.69,
+      "d_saved_pct": 29.2
+    },
+    {
+      "tag": "colbert_skewed",
+      "N": 1000,
+      "avg_ld": 49.0,
+      "max_ld": 69,
+      "varlen_ms": 0.078,
+      "naive_ms": 0.13,
+      "speedup": 1.66,
+      "d_saved_pct": 29.0
+    },
+    {
+      "tag": "colbert_skewed",
+      "N": 5000,
+      "avg_ld": 49.1,
+      "max_ld": 76,
+      "varlen_ms": 0.13,
+      "naive_ms": 0.298,
+      "speedup": 2.29,
+      "d_saved_pct": 35.3
+    },
+    {
+      "tag": "colbert_skewed",
+      "N": 10000,
+      "avg_ld": 49.0,
+      "max_ld": 76,
+      "varlen_ms": 0.215,
+      "naive_ms": 0.632,
+      "speedup": 2.94,
+      "d_saved_pct": 35.5
+    },
+    {
+      "tag": "colbert_skewed",
+      "N": 20000,
+      "avg_ld": 49.0,
+      "max_ld": 79,
+      "varlen_ms": 0.347,
+      "naive_ms": 1.268,
+      "speedup": 3.66,
+      "d_saved_pct": 37.9
+    },
+    {
+      "tag": "colbert_skewed",
+      "N": 50000,
+      "avg_ld": 48.9,
+      "max_ld": 80,
+      "varlen_ms": 0.788,
+      "naive_ms": null,
+      "speedup": null,
+      "d_saved_pct": 38.8
+    },
+    {
+      "tag": "colbert_skewed",
+      "N": 100000,
+      "avg_ld": 49.0,
+      "max_ld": 80,
+      "varlen_ms": 1.508,
+      "naive_ms": null,
+      "speedup": null,
+      "d_saved_pct": 38.8
+    },
+    {
+      "tag": "colpali_varlen",
+      "N": 100,
+      "avg_ld": 657.6,
+      "max_ld": 1023,
+      "varlen_ms": 0.347,
+      "naive_ms": 1.281,
+      "speedup": 3.69,
+      "d_saved_pct": 35.7
+    },
+    {
+      "tag": "colpali_varlen",
+      "N": 500,
+      "avg_ld": 639.0,
+      "max_ld": 1023,
+      "varlen_ms": 1.417,
+      "naive_ms": 5.983,
+      "speedup": 4.22,
+      "d_saved_pct": 37.5
+    },
+    {
+      "tag": "colpali_varlen",
+      "N": 1000,
+      "avg_ld": 634.0,
+      "max_ld": 1023,
+      "varlen_ms": 2.725,
+      "naive_ms": 11.941,
+      "speedup": 4.38,
+      "d_saved_pct": 38.0
+    },
+    {
+      "tag": "colpali_varlen",
+      "N": 2000,
+      "avg_ld": 636.5,
+      "max_ld": 1024,
+      "varlen_ms": 5.155,
+      "naive_ms": 8.932,
+      "speedup": 1.73,
+      "d_saved_pct": 37.8
+    }
+  ]
+}

@@ -201,3 +201,94 @@ def flash_maxsim_rerank_direct(
     assert Q.shape[1] == batch_tensor.shape[1]
 
     return _run_rerank_kernel(Q, batch_tensor, doc_offsets, doc_lengths, max_seqlen_d)
+
+
+def flash_maxsim_rerank_padded(
+    queries: torch.Tensor,
+    documents: torch.Tensor,
+    query_lengths: torch.Tensor | None = None,
+    doc_lengths: torch.Tensor | None = None,
+) -> torch.Tensor:
+    """Batched padded rerank — API mirrors erikkaum/maxsim's
+    ``score_candidates_padded``. Drop-in replacement for that signature.
+
+    For each (b, c), computes
+    ``MaxSim(queries[b, :q_lens[b]], documents[b, c, :d_lens[b, c]])``.
+
+    Args:
+        queries:       [B, Lq, D] — B padded queries
+        documents:     [B, C, Ld, D] — B sets of C padded candidate docs
+        query_lengths: [B] int (optional) — real length per query;
+            default ``Lq`` for all (no masking).
+        doc_lengths:   [B, C] int (optional) — real length per
+            (query, candidate); default ``Ld`` for all.
+
+    Returns:
+        scores: [B, C] float32 — one MaxSim score per (query, candidate).
+
+    Implementation routes through one of two paths:
+      • Uniform lengths (or no length tensors): single fused kernel call via
+        ``flash_maxsim_batched(shared_docs=False)``. This is the fast path
+        and covers Erik's three published benchmark workloads exactly.
+      • Non-uniform lengths: per-query loop over the packed-docs rerank kernel,
+        which handles varlen correctly. Slightly higher Python overhead
+        (B kernel launches), but exactly preserves the masked semantics.
+    """
+    from .flash_maxsim import flash_maxsim_batched
+
+    assert queries.dim() == 3, \
+        f"queries must be [B, Lq, D], got {tuple(queries.shape)}"
+    assert documents.dim() == 4, \
+        f"documents must be [B, C, Ld, D], got {tuple(documents.shape)}"
+    assert queries.shape[0] == documents.shape[0], \
+        "queries and documents must share batch dim B"
+    assert queries.shape[2] == documents.shape[3], \
+        "queries and documents must share embedding dim D"
+
+    B, Lq, _ = queries.shape
+    _, C, Ld, _ = documents.shape
+
+    # Detect uniform lengths in ONE GPU→CPU sync (combining both checks).
+    if query_lengths is None and doc_lengths is None:
+        uniform = True
+    else:
+        q_ok = (query_lengths == Lq).all() if query_lengths is not None else None
+        d_ok = (doc_lengths == Ld).all() if doc_lengths is not None else None
+        if q_ok is not None and d_ok is not None:
+            uniform = bool((q_ok & d_ok).item())
+        elif q_ok is not None:
+            uniform = bool(q_ok.item())
+        else:
+            uniform = bool(d_ok.item())
+
+    if uniform:
+        return flash_maxsim_batched(
+            queries, documents,
+            shared_docs=False,
+            query_lengths=None,
+            doc_lengths=None,
+        )
+
+    # Slow path: varlen masking handled per query via the packed-docs kernel.
+    if query_lengths is None:
+        query_lengths = torch.full((B,), Lq, dtype=torch.int32, device=queries.device)
+    if doc_lengths is None:
+        doc_lengths = torch.full((B, C), Ld, dtype=torch.int32, device=queries.device)
+
+    scores = torch.empty(B, C, device=queries.device, dtype=torch.float32)
+    q_lens_cpu = query_lengths.to(torch.int32).cpu()
+    d_lens_cpu = doc_lengths.to(torch.int32).cpu()
+    for b in range(B):
+        Lq_b = int(q_lens_cpu[b].item())
+        q_b = queries[b, :Lq_b].contiguous()
+        d_lens_b_cpu = d_lens_cpu[b]
+        d_lens_b = doc_lengths[b].to(torch.int32)
+        # Pack only the valid doc tokens for each candidate of query b.
+        valid = [documents[b, c, :int(d_lens_b_cpu[c].item())] for c in range(C)]
+        packed = torch.cat(valid, dim=0)
+        cu = torch.zeros(C + 1, dtype=torch.int32, device=queries.device)
+        cu[1:] = torch.cumsum(d_lens_b, dim=0)
+        max_seqlen = int(d_lens_b_cpu.max().item())
+        scores[b] = flash_maxsim_rerank(q_b, packed, cu, max_seqlen)
+
+    return scores

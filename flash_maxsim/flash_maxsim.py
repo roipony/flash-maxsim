@@ -50,14 +50,23 @@ def _get_configs(gpu=None):
         triton.Config({"BLOCK_Q": 32, "BLOCK_D": 32}, num_warps=4, num_stages=2),
     ]
     if gpu == "hopper":
-        # H100: 228 KB SMEM, WGMMA via tl.dot, TMA automatic, num_stages=3-4
+        # H100: 228 KB SMEM, WGMMA via tl.dot, TMA automatic, num_stages=3-6
         return large_d_configs + [
+            # Existing mid-Lq tuning
             triton.Config({"BLOCK_Q": 32, "BLOCK_D": 64}, num_warps=4, num_stages=3),
             triton.Config({"BLOCK_Q": 32, "BLOCK_D": 128}, num_warps=8, num_stages=3),
             triton.Config({"BLOCK_Q": 64, "BLOCK_D": 64}, num_warps=4, num_stages=3),
             triton.Config({"BLOCK_Q": 64, "BLOCK_D": 128}, num_warps=8, num_stages=3),
             triton.Config({"BLOCK_Q": 128, "BLOCK_D": 64}, num_warps=8, num_stages=2),
             triton.Config({"BLOCK_Q": 128, "BLOCK_D": 128}, num_warps=8, num_stages=2),
+            # Short-Lq (ColBERT-class, Lq<=64) variants: deeper pipelines benefit
+            # the per-doc-token loop more than wide BLOCK_Q at this regime.
+            triton.Config({"BLOCK_Q": 32, "BLOCK_D": 64}, num_warps=4, num_stages=4),
+            triton.Config({"BLOCK_Q": 32, "BLOCK_D": 64}, num_warps=2, num_stages=4),
+            triton.Config({"BLOCK_Q": 32, "BLOCK_D": 128}, num_warps=4, num_stages=4),
+            triton.Config({"BLOCK_Q": 32, "BLOCK_D": 128}, num_warps=8, num_stages=4),
+            triton.Config({"BLOCK_Q": 32, "BLOCK_D": 256}, num_warps=8, num_stages=3),
+            triton.Config({"BLOCK_Q": 64, "BLOCK_D": 256}, num_warps=8, num_stages=3),
         ]
     if gpu == "blackwell":
         # B200: 228 KB SMEM + 256 KB TMEM, deeper pipelines possible
@@ -174,7 +183,7 @@ def _maxsim_fwd_kernel_small(
         Q_block = tl.load(
             Q_ptr + q_idx * stride_q_n + q_off[:, None] * stride_q_l + k_off[None, :] * stride_q_d,
             mask=q_valid[:, None] & k_mask[None, :], other=0.0,
-        ).to(tl.float16)
+        ).to(Q_ptr.dtype.element_ty)
 
         m = tl.full([BLOCK_Q], float("-inf"), dtype=tl.float32)
 
@@ -185,7 +194,7 @@ def _maxsim_fwd_kernel_small(
             D_block = tl.load(
                 D_ptr + d_batch * stride_d_b + d_off[:, None] * stride_d_l + k_off[None, :] * stride_d_d,
                 mask=d_valid[:, None] & k_mask[None, :], other=0.0,
-            ).to(tl.float16)
+            ).to(D_ptr.dtype.element_ty)
 
             S = tl.dot(Q_block, tl.trans(D_block))
             S = tl.where(d_valid[None, :], S, float("-inf"))
@@ -205,7 +214,7 @@ _SMALL_THRESHOLD = 500_000
 # Unified forward kernel (single-query & batched)
 # ---------------------------------------------------------------------------
 
-@triton.autotune(configs=_CONFIGS, key=["Lq", "d_pad"],
+@triton.autotune(configs=_CONFIGS, key=["Lq", "d_pad", "input_dtype"],
                  prune_configs_by={"early_config_prune": _prune_configs})
 @triton.jit
 def _maxsim_fwd_kernel(
@@ -218,6 +227,7 @@ def _maxsim_fwd_kernel(
     shared_docs: tl.constexpr,
     save_argmax: tl.constexpr,
     use_q_lengths: tl.constexpr,
+    input_dtype: tl.constexpr,
     BLOCK_Q: tl.constexpr, BLOCK_D: tl.constexpr,
 ):
     pid = tl.program_id(0)
@@ -251,7 +261,7 @@ def _maxsim_fwd_kernel(
         Q_block = tl.load(
             Q_ptr + q_idx * stride_q_n + q_off[:, None] * stride_q_l + k_off[None, :] * stride_q_d,
             mask=q_valid[:, None] & k_mask[None, :], other=0.0,
-        ).to(tl.float16)
+        ).to(Q_ptr.dtype.element_ty)
 
         m = tl.full([BLOCK_Q], float("-inf"), dtype=tl.float32)
         m_idx = tl.full([BLOCK_Q], 0, dtype=tl.int32)
@@ -263,7 +273,7 @@ def _maxsim_fwd_kernel(
             D_block = tl.load(
                 D_ptr + d_batch * stride_d_b + d_off[:, None] * stride_d_l + k_off[None, :] * stride_d_d,
                 mask=d_valid[:, None] & k_mask[None, :], other=0.0,
-            ).to(tl.float16)
+            ).to(D_ptr.dtype.element_ty)
 
             S = tl.dot(Q_block, tl.trans(D_block))
             S = tl.where(d_valid[None, :], S, float("-inf"))
@@ -305,7 +315,7 @@ def _maxsim_bwd_dQ_kernel(
         j = tl.load(argmax_ptr + b * Lq + q_idx)
         v = tl.load(D_ptr + b * stride_d_b + j * stride_d_l + k * stride_d_d, mask=km, other=0.0).to(tl.float32)
         acc += gs * v
-    tl.store(grad_Q_ptr + q_idx * d + k, acc.to(tl.float16), mask=km)
+    tl.store(grad_Q_ptr + q_idx * d + k, acc.to(grad_Q_ptr.dtype.element_ty), mask=km)
 
 
 @triton.jit
@@ -324,7 +334,7 @@ def _maxsim_bwd_dD_kernel(
         qv = tl.load(Q_ptr + q_idx * stride_q_l + k * stride_q_d, mask=km, other=0.0).to(tl.float32)
         tl.atomic_add(
             grad_D_ptr + doc_id * stride_d_b + j * stride_d_l + k * stride_d_d,
-            (gs * qv).to(tl.float16), mask=km,
+            (gs * qv).to(grad_D_ptr.dtype.element_ty), mask=km,
         )
 
 
@@ -333,6 +343,21 @@ def _maxsim_bwd_dD_kernel(
 # ---------------------------------------------------------------------------
 
 def _launch_fwd(Q, D, lengths, Nq, B, Lq, Ld, d, shared_docs, save_argmax, q_lengths=None):
+    # Dispatch to split-d kernel for fat embeddings. The in-one-shot kernel
+    # below holds the full d-vector as a register tile (d_pad = next_pow2(d)),
+    # which spills hard at d > 512 — bench_fat_embeddings.py measured a 3-18x
+    # cliff at d > 512 on both A100 and H100. The split-d kernel tiles the
+    # embedding dim with an inner BLOCK_K loop and stays close to the
+    # compute roofline. At d > 512 it's 1.1x to 10x faster than the in-one-
+    # shot path (see bench_splitd_perf.py); at d <= 512 the in-one-shot
+    # kernel wins because it skips the inner-loop overhead.
+    from .flash_maxsim_splitd import _launch_fwd_splitd, _SPLITD_THRESH
+    if d > _SPLITD_THRESH:
+        return _launch_fwd_splitd(
+            Q, D, lengths, Nq, B, Lq, Ld, d,
+            shared_docs, save_argmax, q_lengths=q_lengths,
+        )
+
     d_pad = _next_pow2(d)
     scores = torch.empty(Nq, B, device=Q.device, dtype=torch.float32)
     # Zeros (not empty): forward kernel masks writes for padded query positions,
@@ -365,6 +390,7 @@ def _launch_fwd(Q, D, lengths, Nq, B, Lq, Ld, d, shared_docs, save_argmax, q_len
         1 if shared_docs else 0,
         1 if save_argmax else 0,
         1 if use_q_lengths else 0,
+        1 if Q.dtype == torch.bfloat16 else 0,
     )
     return scores, argmax
 
@@ -570,20 +596,40 @@ class _FlashMaxSimFn(torch.autograd.Function):
         return grad_Q, grad_D
 
 
-def flash_maxsim_pairs(q_embs: list, d_embs: list) -> torch.Tensor:
-    """Score a list of (query, doc) pairs. Each pair can have different lengths.
+def flash_maxsim_pairs(q_embs, d_embs) -> torch.Tensor:
+    """Score (query, doc) pairs.
 
-    Args:
-        q_embs: list of [Lq_i, d] tensors (one per query)
-        d_embs: list of [Ld_i, d] tensors (one per doc)
+    Two input forms — same return shape `[N] scores`:
 
-    Returns:
-        [N] scores, one per pair
+      1. **Dense / equal-length** (fast path, no packing overhead):
+         `q_embs: [N, Lq, d]`, `d_embs: [N, Ld, d]` — both are tensors
+         with the same per-pair shape. Routes to a dedicated grid-per-pair
+         kernel that touches HBM exactly once per pair.
+
+      2. **Variable-length** (general path):
+         `q_embs: list[Tensor[Lq_i, d]]`, `d_embs: list[Tensor[Ld_i, d]]`.
+         Packed into a cu_seqlens layout and dispatched to the varlen
+         kernel.
     """
+    # Form 1: already batched as a tensor — dense pairs fast path.
+    if torch.is_tensor(q_embs) and torch.is_tensor(d_embs):
+        from .flash_maxsim_pairs_dense import flash_maxsim_pairs_dense
+        return flash_maxsim_pairs_dense(q_embs, d_embs)
+
+    # Form 2: list inputs. If every Q[i] is the same shape AND every D[i]
+    # is the same shape, stack and use the dense kernel — saves the
+    # list->cu_seqlens packing tax. Otherwise fall through to varlen.
     N = len(q_embs)
     assert N == len(d_embs) and N > 0
+    q_shapes = {tuple(t.shape) for t in q_embs}
+    d_shapes = {tuple(t.shape) for t in d_embs}
+    if len(q_shapes) == 1 and len(d_shapes) == 1:
+        from .flash_maxsim_pairs_dense import flash_maxsim_pairs_dense
+        Q = torch.stack(q_embs, dim=0)
+        D = torch.stack(d_embs, dim=0)
+        return flash_maxsim_pairs_dense(Q, D)
 
-    # Always use varlen — fast for both uniform and variable lengths
+    # Form 3: variable-length list — varlen packing path.
     from .flash_maxsim_varlen import flash_maxsim_varlen, pack_pairs
     Q_pk, D_pk, cu_q, cu_d, max_lq, max_ld = pack_pairs(q_embs, d_embs)
     return flash_maxsim_varlen(Q_pk, D_pk, cu_q, cu_d, max_lq, max_ld)

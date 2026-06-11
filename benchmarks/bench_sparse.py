@@ -4,16 +4,10 @@ import time, torch, torch.nn.functional as F
 assert torch.cuda.is_available(), "CUDA required"
 print(f"GPU: {torch.cuda.get_device_name()}\n")
 
-from flash_maxsim import flash_maxsim, flash_maxsim_sparse, maxsim_sparse_naive
-
-def bench(fn, *a, warmup=10, n=50):
-    for _ in range(warmup): fn(*a)
-    torch.cuda.synchronize()
-    t = []
-    for _ in range(n):
-        torch.cuda.synchronize(); s = time.perf_counter(); fn(*a)
-        torch.cuda.synchronize(); t.append((time.perf_counter()-s)*1000)
-    t.sort(); return t[len(t)//2]
+from flash_maxsim import flash_maxsim
+from flash_maxsim.flash_maxsim_sparse import flash_maxsim_sparse, maxsim_sparse_naive
+from utils import bench_interleaved, compile_high_precision
+maxsim_sparse_compiled = compile_high_precision(maxsim_sparse_naive)
 
 def make_indices(B, Lq, K):
     """Simulate per-doc importance: each doc picks K different tokens."""
@@ -52,9 +46,7 @@ for B, Lq, Ld, d, label in [
     Q = F.normalize(torch.randn(Lq, d, device='cuda', dtype=torch.float16), dim=-1)
     D = F.normalize(torch.randn(B, Ld, d, device='cuda', dtype=torch.float16), dim=-1)
 
-    wup = 5 if Lq >= 512 else 10
-    iters = 20 if Lq >= 512 else 40
-    t_dense = bench(flash_maxsim, Q, D, warmup=wup, n=iters)
+    t_dense = bench_interleaved([flash_maxsim], [[Q, D]]).item()
 
     print(f"\n  {label}")
     print(f"    Dense (100%):      {t_dense:.3f} ms")
@@ -62,7 +54,7 @@ for B, Lq, Ld, d, label in [
     for keep in [0.75, 0.5, 0.25]:
         K = max(1, int(Lq * keep))
         indices = make_indices(B, Lq, K)
-        t_sparse = bench(flash_maxsim_sparse, Q, D, indices, warmup=wup, n=iters)
+        t_sparse = bench_interleaved([flash_maxsim_sparse], [[Q, D, indices]]).item()
         speedup = t_dense / t_sparse if t_sparse > 0 else 0
         pct = int(keep * 100)
         print(f"    Sparse ({pct:2d}%, K={K:4d}): {t_sparse:.3f} ms  ({speedup:.2f}x vs dense)")
@@ -84,9 +76,10 @@ for B, Lq, Ld, d, label in [
 
     wup = 5 if Lq >= 512 else 10
     iters = 20 if Lq >= 512 else 40
-    t_naive = bench(maxsim_sparse_naive, Q, D, indices, warmup=wup, n=iters)
-    t_flash = bench(flash_maxsim_sparse, Q, D, indices, warmup=wup, n=iters)
-    print(f"  {label:15s}: naive={t_naive:.2f}ms  flash={t_flash:.2f}ms  {t_naive/t_flash:.1f}x")
+    t_naive, t_compiled, t_flash = bench_interleaved([maxsim_sparse_naive, maxsim_sparse_compiled, flash_maxsim_sparse],
+                                                     [[Q, D, indices]])
+    print(f"  {label:15s}: naive={t_naive:.2f}ms compiled={t_compiled:.2f}ms flash={t_flash:.2f}ms  "
+          f"naive_speedup={t_naive/t_flash:.1f}x compiled_speedup={t_compiled/t_flash:.1f}x")
 
 print(f"\n{'=' * 65}")
 print("DONE")

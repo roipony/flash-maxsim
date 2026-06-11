@@ -1,0 +1,119 @@
+{
+  "gpu": "NVIDIA H100 80GB HBM3",
+  "torch_version": "2.8.0+cu128",
+  "paths": [
+    "invgrid",
+    "atomic",
+    "atomic_unified"
+  ],
+  "rows": [
+    {
+      "name": "ColBERT B=128",
+      "B": 128,
+      "Lq": 32,
+      "Ld": 180,
+      "invgrid": {
+        "ms": 0.963,
+        "peak_gb": 0.043
+      },
+      "atomic": {
+        "ms": 3.951,
+        "peak_gb": 0.028
+      },
+      "atomic_unified": {
+        "ms": 0.757,
+        "peak_gb": 0.028
+      }
+    },
+    {
+      "name": "ColBERT B=512",
+      "B": 512,
+      "Lq": 32,
+      "Ld": 180,
+      "invgrid": {
+        "ms": 5.757,
+        "peak_gb": 0.43
+      },
+      "atomic": {
+        "ms": 18.616,
+        "peak_gb": 0.134
+      },
+      "atomic_unified": {
+        "ms": 6.215,
+        "peak_gb": 0.134
+      }
+    },
+    {
+      "name": "ColBERT B=1024",
+      "B": 1024,
+      "Lq": 32,
+      "Ld": 180,
+      "invgrid": {
+        "ms": 21.212,
+        "peak_gb": 1.557
+      },
+      "atomic": {
+        "ms": 50.852,
+        "peak_gb": 0.334
+      },
+      "atomic_unified": {
+        "ms": 23.53,
+        "peak_gb": 0.334
+      }
+    },
+    {
+      "name": "ColPali B=32",
+      "B": 32,
+      "Lq": 1024,
+      "Ld": 1024,
+      "invgrid": {
+        "ms": 1.874,
+        "peak_gb": 0.09
+      },
+      "atomic": {
+        "ms": 28.48,
+        "peak_gb": 0.059
+      },
+      "atomic_unified": {
+        "ms": 1.86,
+        "peak_gb": 0.059
+      }
+    },
+    {
+      "name": "ColPali B=64",
+      "B": 64,
+      "Lq": 1024,
+      "Ld": 1024,
+      "invgrid": {
+        "ms": 5.808,
+        "peak_gb": 0.267
+      },
+      "atomic": {
+        "ms": 58.127,
+        "peak_gb": 0.125
+      },
+      "atomic_unified": {
+        "ms": 6.05,
+        "peak_gb": 0.125
+      }
+    },
+    {
+      "name": "ColPali B=128",
+      "B": 128,
+      "Lq": 1024,
+      "Ld": 1024,
+      "invgrid": {
+        "ms": 21.017,
+        "peak_gb": 0.88
+      },
+      "atomic": {
+        "ms": 136.859,
+        "peak_gb": 0.281
+      },
+      "atomic_unified": {
+        "ms": 22.646,
+        "peak_gb": 0.281
+      }
+    }
+  ]
+}

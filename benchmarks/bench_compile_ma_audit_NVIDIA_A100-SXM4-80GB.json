@@ -1,0 +1,52 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "vram_gb": 85.1,
+  "Lq": 1024,
+  "Ld": 1024,
+  "d": 128,
+  "torch": "2.8.0+cu128",
+  "torch_compile_mode": "max-autotune (CUDA graphs ENABLED, dynamic=False)",
+  "rows": [
+    {
+      "B": 1000,
+      "flash": {
+        "ms": 1.685,
+        "ms_p20": 1.68,
+        "ms_p80": 1.69,
+        "peak_gb": 1.056
+      },
+      "eager_fp32_tf32": {
+        "ms": 6.535,
+        "ms_p20": 6.471,
+        "ms_p80": 6.625,
+        "peak_gb": 5.019
+      },
+      "compile_ma": {
+        "ms": 7.529,
+        "ms_p20": 7.525,
+        "ms_p80": 7.543,
+        "peak_gb": 5.557
+      }
+    },
+    {
+      "B": 10000,
+      "flash": {
+        "ms": 16.028,
+        "ms_p20": 16.016,
+        "ms_p80": 16.037,
+        "peak_gb": 7.865
+      },
+      "eager_fp32_tf32": {
+        "ms": 67.275,
+        "ms_p20": 67.107,
+        "ms_p80": 67.674,
+        "peak_gb": 50.104
+      },
+      "compile_ma": {
+        "ms": null,
+        "peak_gb": null,
+        "error": "OutOfMemoryError: CUDA out of memory. Tried to allocate 39.06 GiB. GPU 0 has a total capacity of 79.25 GiB of which 24.47 GiB is free. Inc"
+      }
+    }
+  ]
+}

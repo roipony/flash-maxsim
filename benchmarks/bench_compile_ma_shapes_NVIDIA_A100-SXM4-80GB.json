@@ -1,0 +1,95 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "vram_gb": 85.1,
+  "B": 1000,
+  "d": 128,
+  "torch": "2.8.0+cu128",
+  "torch_compile_mode": "max-autotune (CUDA graphs ENABLED, dynamic=False)",
+  "rows": [
+    {
+      "shape": "textual",
+      "Lq": 32,
+      "Ld": 300,
+      "flash": {
+        "ms": 0.166,
+        "peak_gb": 0.5
+      },
+      "eager_fp32_tf32": {
+        "ms": 0.224,
+        "peak_gb": 0.279
+      },
+      "compile_ma": {
+        "ms": 0.427,
+        "peak_gb": 0.474
+      }
+    },
+    {
+      "shape": "long-doc",
+      "Lq": 32,
+      "Ld": 1024,
+      "flash": {
+        "ms": 0.274,
+        "peak_gb": 0.786
+      },
+      "eager_fp32_tf32": {
+        "ms": 0.584,
+        "peak_gb": 0.927
+      },
+      "compile_ma": {
+        "ms": 1.254,
+        "peak_gb": 1.493
+      }
+    },
+    {
+      "shape": "medium",
+      "Lq": 128,
+      "Ld": 1024,
+      "flash": {
+        "ms": 0.349,
+        "peak_gb": 1.055
+      },
+      "eager_fp32_tf32": {
+        "ms": 1.061,
+        "peak_gb": 1.321
+      },
+      "compile_ma": {
+        "ms": 1.771,
+        "peak_gb": 1.886
+      }
+    },
+    {
+      "shape": "visual",
+      "Lq": 512,
+      "Ld": 1024,
+      "flash": {
+        "ms": 0.926,
+        "peak_gb": 0.787
+      },
+      "eager_fp32_tf32": {
+        "ms": 3.268,
+        "peak_gb": 2.899
+      },
+      "compile_ma": {
+        "ms": 4.234,
+        "peak_gb": 3.459
+      }
+    },
+    {
+      "shape": "ColPali",
+      "Lq": 1024,
+      "Ld": 1024,
+      "flash": {
+        "ms": 2.004,
+        "peak_gb": 0.787
+      },
+      "eager_fp32_tf32": {
+        "ms": 6.628,
+        "peak_gb": 5.019
+      },
+      "compile_ma": {
+        "ms": 7.649,
+        "peak_gb": 5.557
+      }
+    }
+  ]
+}
