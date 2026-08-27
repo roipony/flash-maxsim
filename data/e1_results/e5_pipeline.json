@@ -1,0 +1,83 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "corpus": "hotpotqa-500K",
+  "model": "colbert-ir/colbertv2.0",
+  "Nq": 500,
+  "B": 500000,
+  "Lq": 32,
+  "Ld": 180,
+  "encode_ms_per_query_b1": 8.92,
+  "stage1_ms_per_query": 0.205,
+  "rows": [
+    {
+      "K": 1000,
+      "gather_ms": 0.09,
+      "rerank_ms_flash": 0.14,
+      "rerank_ms_chunked": 0.18,
+      "ndcg10_stage1": 0.0715,
+      "ndcg10_reranked": 0.2116,
+      "recall10_stage1": 0.156,
+      "recall10_reranked": 0.372,
+      "total_ms_flash": 9.36,
+      "qps_flash": 106.9,
+      "total_ms_chunked": 9.39,
+      "qps_chunked": 106.4
+    },
+    {
+      "K": 5000,
+      "gather_ms": 0.31,
+      "rerank_ms_flash": 0.25,
+      "rerank_ms_chunked": 0.48,
+      "ndcg10_stage1": 0.0715,
+      "ndcg10_reranked": 0.2361,
+      "recall10_stage1": 0.156,
+      "recall10_reranked": 0.408,
+      "total_ms_flash": 9.69,
+      "qps_flash": 103.3,
+      "total_ms_chunked": 9.92,
+      "qps_chunked": 100.9
+    },
+    {
+      "K": 10000,
+      "gather_ms": 0.59,
+      "rerank_ms_flash": 0.38,
+      "rerank_ms_chunked": 0.86,
+      "ndcg10_stage1": 0.0715,
+      "ndcg10_reranked": 0.2418,
+      "recall10_stage1": 0.156,
+      "recall10_reranked": 0.42,
+      "total_ms_flash": 10.1,
+      "qps_flash": 99.1,
+      "total_ms_chunked": 10.57,
+      "qps_chunked": 94.6
+    },
+    {
+      "K": 50000,
+      "gather_ms": 2.87,
+      "rerank_ms_flash": 1.41,
+      "rerank_ms_chunked": 3.88,
+      "ndcg10_stage1": 0.0715,
+      "ndcg10_reranked": 0.251,
+      "recall10_stage1": 0.156,
+      "recall10_reranked": 0.436,
+      "total_ms_flash": 13.41,
+      "qps_flash": 74.6,
+      "total_ms_chunked": 15.88,
+      "qps_chunked": 63.0
+    },
+    {
+      "K": 100000,
+      "gather_ms": 5.7,
+      "rerank_ms_flash": 2.7,
+      "rerank_ms_chunked": 7.65,
+      "ndcg10_stage1": 0.0715,
+      "ndcg10_reranked": 0.2565,
+      "recall10_stage1": 0.156,
+      "recall10_reranked": 0.446,
+      "total_ms_flash": 17.52,
+      "qps_flash": 57.1,
+      "total_ms_chunked": 22.48,
+      "qps_chunked": 44.5
+    }
+  ]
+}

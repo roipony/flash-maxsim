@@ -1,0 +1,41 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "encoder": "lightonai_colbertv2",
+  "results": [
+    {
+      "dataset": "scidocs",
+      "encoder": "lightonai_colbertv2",
+      "N_queries": 1000,
+      "corpus_size": 25657,
+      "doc_dim": 128,
+      "wall_baseline_s": 7.23,
+      "wall_flash_s": 3.142,
+      "scoring_speedup": 2.3,
+      "ranking_exact_match_top10": 1000,
+      "per_K": {
+        "5": {
+          "ndcg_baseline": 0.1341,
+          "ndcg_flash": 0.1341,
+          "recall_baseline": 0.1217,
+          "recall_flash": 0.1217,
+          "mrr_baseline": 0.2674,
+          "mrr_flash": 0.2674,
+          "topk_overlap_pct": 100.0
+        },
+        "10": {
+          "ndcg_baseline": 0.1565,
+          "ndcg_flash": 0.1565,
+          "recall_baseline": 0.163,
+          "recall_flash": 0.163,
+          "mrr_baseline": 0.2776,
+          "mrr_flash": 0.2776,
+          "topk_overlap_pct": 100.0
+        }
+      }
+    },
+    {
+      "dataset": "trec-covid",
+      "error": "FileNotFoundError: No BEIR bundle for (trec-covid, lightonai_colbertv2)"
+    }
+  ]
+}

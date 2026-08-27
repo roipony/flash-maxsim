@@ -1,0 +1,37 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "encoder": "lightonai_colbertv2",
+  "results": [
+    {
+      "dataset": "arguana",
+      "encoder": "lightonai_colbertv2",
+      "N_queries": 1406,
+      "corpus_size": 8674,
+      "doc_dim": 128,
+      "wall_baseline_s": 3.943,
+      "wall_flash_s": 2.652,
+      "scoring_speedup": 1.49,
+      "ranking_exact_match_top10": 1405,
+      "per_K": {
+        "5": {
+          "ndcg_baseline": 0.2844,
+          "ndcg_flash": 0.2844,
+          "recall_baseline": 0.5277,
+          "recall_flash": 0.5277,
+          "mrr_baseline": 0.2031,
+          "mrr_flash": 0.2031,
+          "topk_overlap_pct": 100.0
+        },
+        "10": {
+          "ndcg_baseline": 0.3308,
+          "ndcg_flash": 0.3308,
+          "recall_baseline": 0.6707,
+          "recall_flash": 0.6707,
+          "mrr_baseline": 0.2224,
+          "mrr_flash": 0.2224,
+          "topk_overlap_pct": 100.0
+        }
+      }
+    }
+  ]
+}

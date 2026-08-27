@@ -1,0 +1,86 @@
+{
+  "probe": [
+    {
+      "batch_size": 32,
+      "torch": {
+        "ok": true,
+        "peak_gb": 0.044928512
+      },
+      "flash": {
+        "ok": true,
+        "peak_gb": 0.024520704
+      }
+    },
+    {
+      "batch_size": 64,
+      "torch": {
+        "ok": true,
+        "peak_gb": 0.116992
+      },
+      "flash": {
+        "ok": true,
+        "peak_gb": 0.031164928
+      }
+    },
+    {
+      "batch_size": 128,
+      "torch": {
+        "ok": true,
+        "peak_gb": 0.401508864
+      },
+      "flash": {
+        "ok": true,
+        "peak_gb": 0.044698624
+      }
+    },
+    {
+      "batch_size": 256,
+      "torch": {
+        "ok": true,
+        "peak_gb": 1.541803008
+      },
+      "flash": {
+        "ok": true,
+        "peak_gb": 0.073928704
+      }
+    },
+    {
+      "batch_size": 512,
+      "torch": {
+        "ok": true,
+        "peak_gb": 6.085152768
+      },
+      "flash": {
+        "ok": true,
+        "peak_gb": 0.139728896
+      }
+    },
+    {
+      "batch_size": 1024,
+      "torch": {
+        "ok": true,
+        "peak_gb": 24.2349568
+      },
+      "flash": {
+        "ok": true,
+        "peak_gb": 0.30016512
+      }
+    },
+    {
+      "batch_size": 2048,
+      "torch": {
+        "ok": false,
+        "peak_gb": null,
+        "error": "OOM"
+      },
+      "flash": {
+        "ok": true,
+        "peak_gb": 0.730089472
+      }
+    }
+  ],
+  "query_len": 32,
+  "doc_len": 180,
+  "dim": 128,
+  "gpu": "NVIDIA A100-SXM4-80GB"
+}

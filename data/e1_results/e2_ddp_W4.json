@@ -1,0 +1,191 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "world": 4,
+  "Lq": 32,
+  "Ld": 180,
+  "dim": 128,
+  "tau": 0.02,
+  "runs": 5,
+  "gradient_verify": {
+    "B_global": 256,
+    "cos_gradD": 1.0,
+    "cos_gradQ": 0.99999988,
+    "rel_err_gradD": 0.00029435,
+    "tiled_cos_gradD": 0.99999988,
+    "tiled_rel_err_gradD": 0.00029501
+  },
+  "rows": [
+    {
+      "B_global": 256,
+      "B_local": 64,
+      "negatives_per_query": 255,
+      "conventional": {
+        "ok": true,
+        "peak_gb": 1.2102,
+        "step_ms": 9.0
+      },
+      "fm-sharded": {
+        "ok": true,
+        "peak_gb": 0.0597,
+        "step_ms": 4.11
+      },
+      "fm-flash-tiled": {
+        "ok": true,
+        "peak_gb": 0.0564,
+        "step_ms": 3.78
+      }
+    },
+    {
+      "B_global": 512,
+      "B_local": 128,
+      "negatives_per_query": 511,
+      "conventional": {
+        "ok": true,
+        "peak_gb": 4.6477,
+        "step_ms": 30.15
+      },
+      "fm-sharded": {
+        "ok": true,
+        "peak_gb": 0.0849,
+        "step_ms": 6.95
+      },
+      "fm-flash-tiled": {
+        "ok": true,
+        "peak_gb": 0.076,
+        "step_ms": 7.1
+      }
+    },
+    {
+      "B_global": 1024,
+      "B_local": 256,
+      "negatives_per_query": 1023,
+      "conventional": {
+        "ok": true,
+        "peak_gb": 18.3178,
+        "step_ms": 101.82
+      },
+      "fm-sharded": {
+        "ok": true,
+        "peak_gb": 0.1521,
+        "step_ms": 15.02
+      },
+      "fm-flash-tiled": {
+        "ok": true,
+        "peak_gb": 0.1248,
+        "step_ms": 17.05
+      }
+    },
+    {
+      "B_global": 2048,
+      "B_local": 512,
+      "negatives_per_query": 2047,
+      "conventional": {
+        "ok": true,
+        "peak_gb": 72.8388,
+        "step_ms": 985.35
+      },
+      "fm-sharded": {
+        "ok": true,
+        "peak_gb": 0.3461,
+        "step_ms": 56.34
+      },
+      "fm-flash-tiled": {
+        "ok": true,
+        "peak_gb": 0.2538,
+        "step_ms": 57.95
+      }
+    },
+    {
+      "B_global": 4096,
+      "B_local": 1024,
+      "negatives_per_query": 4095,
+      "conventional": {
+        "ok": false
+      },
+      "fm-sharded": {
+        "ok": true,
+        "peak_gb": 0.9742,
+        "step_ms": 235.12
+      },
+      "fm-flash-tiled": {
+        "ok": true,
+        "peak_gb": 0.6387,
+        "step_ms": 285.45
+      }
+    },
+    {
+      "B_global": 8192,
+      "B_local": 2048,
+      "negatives_per_query": 8191,
+      "conventional": {
+        "ok": false,
+        "skipped": "OOM at smaller B"
+      },
+      "fm-sharded": {
+        "ok": true,
+        "peak_gb": 3.1836,
+        "step_ms": 961.18
+      },
+      "fm-flash-tiled": {
+        "ok": true,
+        "peak_gb": 1.9086,
+        "step_ms": 959.94
+      }
+    },
+    {
+      "B_global": 16384,
+      "B_local": 4096,
+      "negatives_per_query": 16383,
+      "conventional": {
+        "ok": false,
+        "skipped": "OOM at smaller B"
+      },
+      "fm-sharded": {
+        "ok": true,
+        "peak_gb": 11.4296,
+        "step_ms": 3903.03
+      },
+      "fm-flash-tiled": {
+        "ok": true,
+        "peak_gb": 3.685,
+        "step_ms": 5347.81
+      }
+    },
+    {
+      "B_global": 32768,
+      "B_local": 8192,
+      "negatives_per_query": 32767,
+      "conventional": {
+        "ok": false,
+        "skipped": "OOM at smaller B"
+      },
+      "fm-sharded": {
+        "ok": true,
+        "peak_gb": 43.2226,
+        "step_ms": 15788.7
+      },
+      "fm-flash-tiled": {
+        "ok": true,
+        "peak_gb": 7.049,
+        "step_ms": 21191.02
+      }
+    },
+    {
+      "B_global": 65536,
+      "B_local": 16384,
+      "negatives_per_query": 65535,
+      "conventional": {
+        "ok": false,
+        "skipped": "OOM at smaller B"
+      },
+      "fm-sharded": {
+        "ok": false
+      },
+      "fm-flash-tiled": {
+        "ok": true,
+        "peak_gb": 14.0309,
+        "step_ms": 84911.05
+      }
+    }
+  ]
+}

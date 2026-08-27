@@ -1,0 +1,114 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "model": "vidore/colpali-v1.2-hf",
+  "grad_ckpt": [
+    "vlm",
+    "vlm.vision_tower",
+    "vlm.vision_tower.vision_model",
+    "vlm.language_model"
+  ],
+  "lora": "peft-lora r=32 (13.3M trainable)",
+  "page_as_query": true,
+  "steps": [
+    {
+      "loss": 4080.0,
+      "wall_s": 3.26,
+      "peak_gb": 10.663,
+      "Lq": 1030,
+      "Ld": 1030,
+      "dim": 128,
+      "B": 8,
+      "backend": "torch"
+    },
+    {
+      "loss": 4028.135498046875,
+      "wall_s": 351.34,
+      "peak_gb": 10.769,
+      "Lq": 1030,
+      "Ld": 1030,
+      "dim": 128,
+      "B": 8,
+      "backend": "flash"
+    },
+    {
+      "loss": 3504.0,
+      "wall_s": 4.86,
+      "peak_gb": 15.504,
+      "Lq": 1030,
+      "Ld": 1030,
+      "dim": 128,
+      "B": 16,
+      "backend": "torch"
+    },
+    {
+      "loss": 3380.41845703125,
+      "wall_s": 8.33,
+      "peak_gb": 15.505,
+      "Lq": 1030,
+      "Ld": 1030,
+      "dim": 128,
+      "B": 16,
+      "backend": "flash"
+    },
+    {
+      "loss": 3472.0,
+      "wall_s": 8.27,
+      "peak_gb": 24.963,
+      "Lq": 1030,
+      "Ld": 1030,
+      "dim": 128,
+      "B": 32,
+      "backend": "torch"
+    },
+    {
+      "loss": 3368.174072265625,
+      "wall_s": 8.28,
+      "peak_gb": 24.963,
+      "Lq": 1030,
+      "Ld": 1030,
+      "dim": 128,
+      "B": 32,
+      "backend": "flash"
+    },
+    {
+      "loss": 4800.0,
+      "wall_s": 16.21,
+      "peak_gb": 44.029,
+      "Lq": 1030,
+      "Ld": 1030,
+      "dim": 128,
+      "B": 64,
+      "backend": "torch"
+    },
+    {
+      "loss": 4689.2890625,
+      "wall_s": 16.42,
+      "peak_gb": 43.898,
+      "Lq": 1030,
+      "Ld": 1030,
+      "dim": 128,
+      "B": 64,
+      "backend": "flash"
+    },
+    {
+      "loss": 4800.0,
+      "wall_s": 24.81,
+      "peak_gb": 76.061,
+      "Lq": 1030,
+      "Ld": 1030,
+      "dim": 128,
+      "B": 96,
+      "backend": "torch"
+    },
+    {
+      "loss": 4620.3359375,
+      "wall_s": 24.28,
+      "peak_gb": 62.828,
+      "Lq": 1030,
+      "Ld": 1030,
+      "dim": 128,
+      "B": 96,
+      "backend": "flash"
+    }
+  ]
+}

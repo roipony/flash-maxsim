@@ -1,0 +1,73 @@
+{
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "shape": {
+    "Lq": 1024,
+    "Ld": 1024,
+    "d": 128,
+    "Nq": "=B"
+  },
+  "rows": [
+    {
+      "ok": true,
+      "peak_gb": 0.1091,
+      "baseline_QD_gb": 0.0336,
+      "grads_gb": 0.0336,
+      "analytic_S_gb": 17.1799,
+      "analytic_argmax_gb": 0.0168,
+      "residual_transient_gb": 0.0252,
+      "B": 64,
+      "method": "flash-unified"
+    },
+    {
+      "ok": true,
+      "peak_gb": 0.2793,
+      "baseline_QD_gb": 0.0336,
+      "grads_gb": 0.0336,
+      "analytic_S_gb": 17.1799,
+      "analytic_argmax_gb": 0.0168,
+      "residual_transient_gb": 0.1954,
+      "B": 64,
+      "method": "flash-invgrid"
+    },
+    {
+      "ok": true,
+      "peak_gb": 51.6573,
+      "baseline_QD_gb": 0.0336,
+      "grads_gb": 0.0336,
+      "analytic_S_gb": 17.1799,
+      "analytic_argmax_gb": 0.0168,
+      "residual_transient_gb": 51.5902,
+      "B": 64,
+      "method": "vanilla"
+    },
+    {
+      "ok": true,
+      "peak_gb": 0.2521,
+      "baseline_QD_gb": 0.0671,
+      "grads_gb": 0.0671,
+      "analytic_S_gb": 68.7195,
+      "analytic_argmax_gb": 0.0671,
+      "residual_transient_gb": 0.0507,
+      "B": 128,
+      "method": "flash-unified"
+    },
+    {
+      "ok": true,
+      "peak_gb": 0.9637,
+      "baseline_QD_gb": 0.0671,
+      "grads_gb": 0.0671,
+      "analytic_S_gb": 68.7195,
+      "analytic_argmax_gb": 0.0671,
+      "residual_transient_gb": 0.7624,
+      "B": 128,
+      "method": "flash-invgrid"
+    },
+    {
+      "ok": false,
+      "oom": true,
+      "baseline_QD_gb": 0.0671,
+      "B": 128,
+      "method": "vanilla"
+    }
+  ]
+}

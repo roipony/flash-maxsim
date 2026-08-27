@@ -1,0 +1,14 @@
+{
+  "arm": "b2048_flash_s0_lr-sqrt",
+  "batch_size": 2048,
+  "backend": "flash",
+  "seed": 0,
+  "lr_mode": "sqrt",
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "base_model": "bert-base-uncased",
+  "total_examples_budget": 400000,
+  "train": {
+    "oom": true,
+    "error": "CUDA out of memory. Tried to allocate 1.05 GiB. GPU 0 has a total capacity of 79.25 GiB of which 759.94 MiB is free. Including non-PyTorch memory, this process has 78.50 GiB memory in use. Of the allocated memory 77.81 GiB is allocated by PyTorch, and 164.74 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segmen"
+  }
+}
