@@ -303,8 +303,10 @@ Tested on: H100 80GB, A100 80GB/40GB, V100.
 **IBM Research Israel**
 
 - Roi Pony
+- Daniel Ezer
 - Adi Raz Goldfarb
 - Idan Friedman
+- Oshri Naparstek
 - Udi Barzelay
 
 ## License
