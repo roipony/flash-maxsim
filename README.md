@@ -309,6 +309,24 @@ Tested on: H100 80GB, A100 80GB/40GB, V100.
 - Oshri Naparstek
 - Udi Barzelay
 
+## Citation
+
+If you use Flash-MaxSim in your research, please cite the paper
+([arXiv:2605.29517](https://arxiv.org/abs/2605.29517), accepted to the
+EMNLP 2026 Industry Track):
+
+```bibtex
+@misc{pony2026flashmaxsim,
+      title={Flash-MaxSim: IO-Aware Fused Kernels for Late-Interaction Retrieval},
+      author={Roi Pony and Daniel Ezer and Adi Raz Goldfarb and Idan Friedman and Oshri Naparstek and Udi Barzelay},
+      year={2026},
+      eprint={2605.29517},
+      archivePrefix={arXiv},
+      primaryClass={cs.IR},
+      url={https://arxiv.org/abs/2605.29517},
+}
+```
+
 ## License
 
 Apache 2.0
